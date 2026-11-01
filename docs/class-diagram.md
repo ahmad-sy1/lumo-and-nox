@@ -16,6 +16,8 @@ De `LevelManager` is het centrum van een level. `Player`, `Checkpoint`, `Crystal
 
 `LightPlatform` en `ShadowWall` zijn de puzzel-onderdelen die reageren op de krachten Gloed en Schaduwstap. `HUD`, `MainMenu`, `PauseMenu` en `WinScreen` zijn de schermen. `MainMenu` start het spel of een level via de `GameManager`. We houden het klein, want het is een MVP van 3 weken.
 
+`Palette` bevat de kleuren van Lumo en Nox als vaste waarden, dezelfde als in `tools/generate_tiles.py`. Zo gebruiken scripts (bijvoorbeeld voor licht of de HUD) precies dezelfde kleuren als de graphics.
+
 `OptionsMenu` is te openen vanuit het hoofdmenu en het pauzemenu. `Terug` gaat naar het scherm waar je vandaan kwam. Elke wijziging wordt meteen opgeslagen via `GameManager.SaveSettings()`. Bij het starten laadt de `GameManager` de instellingen en past ze toe met `ApplySettings()`. De `SwapManager` leest `flashWarning` om te bepalen of het scherm mag knipperen bij de wissel.
 
 ## Data-model

@@ -145,7 +145,7 @@ We maken 2 levels. Elk level wordt door één persoon gebouwd.
 
 We gebruiken **Unity** (Universal 2D) met **C#**. We kiezen Unity omdat daar veel meer hulp en tutorials voor te vinden zijn. Dat helpt ons als we vastlopen in de 3 weken.
 
-- **Assets:** Kenney.nl (Pixel Platformer en geluiden), aangepast naar donkere kleuren.
+- **Graphics:** zelf gemaakt in het palet van Lumo en Nox (licht = goed: warm en rond; schaduw = kwaad: koud en puntig), zie `docs/art/`. **Geluid:** Kenney (CC0).
 - **Versiebeheer:** GitHub, met een main-branch en per taak een eigen branch. Mergen via een pull request die de ander bekijkt.
 
 Belangrijkste klassen (basis voor het klassendiagram). Bijna alle klassen zijn een `MonoBehaviour` die we op een GameObject zetten. Elke klasse staat in een eigen C#-bestand in `Assets/Scripts/`.
@@ -191,7 +191,7 @@ Het spel verzamelt geen persoonlijke gegevens en werkt helemaal offline.
 - Geen geweld of bloed: als je doodgaat, valt je figuur uit elkaar in vonkjes of rook. Geschikt voor alle leeftijden.
 - De wissel-waarschuwing is zowel te zien (knipperen en een rode timerbalk) als te horen (piep), zodat je hem niet mist. Het knipperen is standaard rustig, nooit fel.
 - Voor mensen die gevoelig zijn voor flitsend licht kun je het knipperen in Opties helemaal uitzetten. De waarschuwing blijft dan werken via de piep en de rode timerbalk. Zo is het spel speelbaar voor iedereen, zonder dat iemand een waarschuwing mist.
-- Alle assets komen van Kenney.nl en mogen vrij gebruikt worden.
+- De graphics maken we zelf. Het geluid komt van Kenney.nl (CC0) en mag vrij gebruikt worden.
 
 ## Ontwerpdocumenten
 

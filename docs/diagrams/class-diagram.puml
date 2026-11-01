@@ -182,6 +182,13 @@ note right of SaveData
   zie data-model.puml
 end note
 
+class Palette <<static>> {
+  + {static} steen : Color
+  + {static} rots : Color
+  + {static} kristal : Color
+  ...
+}
+
 ' Overerving
 Zone <|-- LightZone
 Zone <|-- DarkZone
