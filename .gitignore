@@ -110,3 +110,9 @@ InitTestScene*.unity*
 
 # JetBrains Rider / IDEA
 .idea/
+
+# macOS
+.DS_Store
+
+# Godot leftovers
+.godot/
