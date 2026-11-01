@@ -16,8 +16,15 @@ De `LevelManager` is het centrum van een level. `Player`, `Checkpoint`, `Crystal
 
 `LightPlatform` en `ShadowWall` zijn de puzzel-onderdelen die reageren op de krachten Gloed en Schaduwstap. `HUD`, `MainMenu`, `PauseMenu` en `WinScreen` zijn de schermen. `MainMenu` start het spel of een level via de `GameManager`. We houden het klein, want het is een MVP van 3 weken.
 
+`OptionsMenu` is te openen vanuit het hoofdmenu en het pauzemenu. `Terug` gaat naar het scherm waar je vandaan kwam. Elke wijziging wordt meteen opgeslagen via `GameManager.SaveSettings()`. Bij het starten laadt de `GameManager` de instellingen en past ze toe met `ApplySettings()`. De `SwapManager` leest `flashWarning` om te bepalen of het scherm mag knipperen bij de wissel.
+
 ## Data-model
 
 ![Data-model](diagrams/data-model.svg)
 
-We slaan alleen de voortgang op: per level of het gehaald is, de beste tijd en het aantal kristallen. Dat doen we in één JSON-bestand (`save.json`) op de eigen computer. JSON is simpel en met `JsonUtility` van Unity zit het er snel in. We bewaren geen persoonlijke gegevens, dus het spel blijft offline.
+We slaan twee dingen op in één JSON-bestand (`save.json`) op de eigen computer: de voortgang en de instellingen. JSON is simpel en met `JsonUtility` van Unity zit het er snel in.
+
+- **Voortgang:** per level of het gehaald is, de beste tijd en het aantal kristallen. Daarmee weten we ook of Level 2 open is.
+- **Instellingen:** het volume van muziek en geluidseffecten, volledig scherm, en of het scherm mag knipperen bij de wissel. Knipperen staat standaard aan (`flashWarning = true`). Het scherm knippert dan rustig, nooit fel. In Opties kun je het uitzetten voor mensen die gevoelig zijn voor flitsend licht (`flashWarning = false`). Dan hoor je alleen de piep en zie je de rode timerbalk.
+
+We bewaren geen persoonlijke gegevens, dus het spel blijft offline.

@@ -133,6 +133,8 @@ class GameManager <<MonoBehaviour>> {
   + LoadLevel(index : int) : void
   + LoadProgress() : void
   + SaveProgress(levelIndex : int, time : float, crystals : int) : void
+  + SaveSettings() : void
+  + ApplySettings() : void
 }
 
 class MainMenu <<MonoBehaviour>> {
@@ -153,6 +155,16 @@ class PauseMenu <<MonoBehaviour>> {
   + Resume() : void
   + Restart() : void
   + GoToMainMenu() : void
+}
+
+class OptionsMenu <<MonoBehaviour>> {
+  - musicSlider : Slider
+  - sfxSlider : Slider
+  - fullscreenToggle : Toggle
+  - flashToggle : Toggle
+  + Show(cameFrom : string) : void
+  + OnSettingChanged() : void
+  + Back() : void
 }
 
 class WinScreen <<MonoBehaviour>> {
@@ -210,5 +222,9 @@ LevelManager --> "1" WinScreen
 MainMenu ..> "1" GameManager
 PauseMenu ..> "1" GameManager
 WinScreen ..> "1" GameManager
+MainMenu ..> "1" OptionsMenu : Opties
+PauseMenu ..> "1" OptionsMenu : Opties
+OptionsMenu ..> "1" GameManager : SaveSettings()
+SwapManager ..> "1" GameManager : leest flashWarning
 GameManager --> "1" SaveData
 @enduml

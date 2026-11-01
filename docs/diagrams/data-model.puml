@@ -43,8 +43,10 @@ note right of Settings
   Volumes: 0 t/m 1
   Standaard: musicVolume 0.8, sfxVolume 0.8,
   fullscreen true, flashWarning true
-  flashWarning false = alleen piep + rode
-  timerbalk, geen knipperen
+  flashWarning true = scherm knippert rustig
+  (in Opties: "Rustig")
+  flashWarning false = geen knipperen, alleen
+  piep + rode timerbalk (in Opties: "Uit")
 end note
 
 saveFile ..> SaveData : bevat
