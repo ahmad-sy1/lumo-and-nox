@@ -10,10 +10,12 @@ note right of saveFile
   Opgeslagen met JsonUtility.
   Map: Application.persistentDataPath
   Lokaal op de computer, offline.
+  Geen persoonlijke gegevens.
 end note
 
 class SaveData {
   + levels : LevelProgress[]
+  + settings : Settings
 }
 
 class LevelProgress {
@@ -26,8 +28,26 @@ class LevelProgress {
 note right of LevelProgress
   bestTime in seconden (0 = nog niet gehaald)
   crystalsFound: 0 t/m 3
+  Level 2 is op slot zolang
+  Level 1 niet completed is
+end note
+
+class Settings {
+  + musicVolume : float
+  + sfxVolume : float
+  + fullscreen : bool
+  + flashWarning : bool
+}
+
+note right of Settings
+  Volumes: 0 t/m 1
+  Standaard: musicVolume 0.8, sfxVolume 0.8,
+  fullscreen true, flashWarning true
+  flashWarning false = alleen piep + rode
+  timerbalk, geen knipperen
 end note
 
 saveFile ..> SaveData : bevat
 SaveData *-- "2" LevelProgress
+SaveData *-- "1" Settings
 @enduml
