@@ -111,6 +111,8 @@ flowchart TD
     Level -- Level klaar --> Win[Winscherm<br/>Volgend level · Opnieuw · Hoofdmenu]
 ```
 
+De wireframes van alle schermen staan in [docs/wireframes](wireframes/README.md).
+
 Met Esc open je tijdens het spelen het pauzemenu. Opties is ook vanuit het pauzemenu te openen en gaat dan terug naar het pauzemenu.
 
 ## Levels
