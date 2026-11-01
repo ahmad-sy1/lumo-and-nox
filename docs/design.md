@@ -113,7 +113,16 @@ flowchart TD
 
 De wireframes van alle schermen staan in [docs/wireframes](wireframes/README.md).
 
-Met Esc open je tijdens het spelen het pauzemenu. Opties is ook vanuit het pauzemenu te openen en gaat dan terug naar het pauzemenu.
+Met Esc open je tijdens het spelen het pauzemenu. Tijdens de pauze staat de wissel-timer stil. Opties is ook vanuit het pauzemenu te openen en gaat dan terug naar het pauzemenu.
+
+In Opties kun je:
+
+- het volume van muziek en geluidseffecten instellen;
+- volledig scherm aan- of uitzetten;
+- het knipperen bij de wissel op **Rustig** of **Uit** zetten;
+- de besturing bekijken (niet aanpassen).
+
+Instellingen worden meteen lokaal opgeslagen, samen met de voortgang (zie het data-model in [class-diagram.md](class-diagram.md)).
 
 ## Levels
 
@@ -157,6 +166,8 @@ Belangrijkste klassen (basis voor het klassendiagram). Bijna alle klassen zijn e
 | GameManager | MonoBehaviour (blijft bestaan tussen scenes) | Scenes laden, voortgang opslaan |
 | HUD / Menu | MonoBehaviour (UI) | Schermen tonen |
 
+Daarnaast is er een `OptionsMenu` voor het Opties-scherm. Het uitgewerkte klassendiagram en het data-model staan in [class-diagram.md](class-diagram.md).
+
 ## Taakverdeling en planning
 
 We werken met 3 sprints van 1 week, met aan het eind van elke week een korte review en retrospective.
@@ -168,7 +179,7 @@ We werken met 3 sprints van 1 week, met aan het eind van elke week een korte rev
 
 | Week | Wat |
 | --- | --- |
-| 1 – Ontwerpen | Dit document, klassendiagram, wireframes, menu-flowchart, Git-repo, akkoord docent |
+| 1 – Ontwerpen | Dit document, klassendiagram, data-model, use case diagram, wireframes, activiteitendiagrammen, menu-flowchart, Git-repo, akkoord docent |
 | 2 – Bouwen | Spelers en wissel werkend, puzzel-onderdelen, level 1 en 2 bouwen, menu's |
 | 3 – Testen en presenteren | Laten testen, bugs fixen, documentatie, filmpje opnemen |
 
@@ -176,7 +187,20 @@ We werken met 3 sprints van 1 week, met aan het eind van elke week een korte rev
 
 Het spel verzamelt geen persoonlijke gegevens en werkt helemaal offline.
 
-- Alleen de voortgang (welk level gehaald is) wordt lokaal op de computer opgeslagen.
+- Alleen de voortgang (welke levels gehaald zijn, beste tijd, kristallen) en de instellingen worden opgeslagen, in één bestand (`save.json`) op de eigen computer. Er gaat niets over internet.
 - Geen geweld of bloed: als je doodgaat, valt je figuur uit elkaar in vonkjes of rook. Geschikt voor alle leeftijden.
-- De wissel-waarschuwing is zowel te zien (knipperen) als te horen (piep), zodat je hem niet mist. We houden het knipperen rustig, zodat het niet vervelend is voor mensen die gevoelig zijn voor flitsend licht.
+- De wissel-waarschuwing is zowel te zien (knipperen en een rode timerbalk) als te horen (piep), zodat je hem niet mist. Het knipperen is standaard rustig, nooit fel.
+- Voor mensen die gevoelig zijn voor flitsend licht kun je het knipperen in Opties helemaal uitzetten. De waarschuwing blijft dan werken via de piep en de rode timerbalk. Zo is het spel speelbaar voor iedereen, zonder dat iemand een waarschuwing mist.
 - Alle assets komen van Kenney.nl en mogen vrij gebruikt worden.
+
+## Ontwerpdocumenten
+
+Het ontwerp bestaat uit deze onderdelen. Samen dekken ze de data, de gebruiker en de logica van het spel.
+
+| Laag | Schema | Waar |
+| --- | --- | --- |
+| Data | Klassendiagram en data-model (PlantUML) | [class-diagram.md](class-diagram.md) |
+| Gebruiker | Wireframes van alle schermen + levelschets Level 1 | [wireframes](wireframes/README.md) |
+| Gebruiker | Use case diagram (PlantUML) | volgt (Osama) |
+| Logica | Activiteitendiagrammen (PlantUML), 12 stuks | [activiteitendiagrammen](activiteitendiagrammen/) |
+| Navigatie | Menu-flowchart | zie [Menu's en navigatie](#menus-en-navigatie) hierboven |
