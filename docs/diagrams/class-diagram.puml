@@ -70,6 +70,8 @@ class MovingPlatform <<MonoBehaviour>> {
   - pointB : Transform
   - speed : float
   - isMoving : bool
+  - body : Rigidbody2D
+  - target : Transform
   + Activate() : void
   + Deactivate() : void
   - Move() : void

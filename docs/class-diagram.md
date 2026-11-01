@@ -8,7 +8,7 @@ We maken één klasse `Player`. Lumo en Nox zijn twee spelers met andere instell
 
 Een speler gebruikt een `Lever` met `Interact()`. De `Lever` krijgt dan een `Use()`-aanroep.
 
-Alles wat je aan en uit kunt zetten erft van `Activatable`: `Door`, `Lamp` en `MovingPlatform`. Een `Lever` of `PressButton` kent alleen een `target`. Zo kan één knop later ook iets anders aansturen, zonder dat we de knop aanpassen.
+Alles wat je aan en uit kunt zetten erft van `Activatable`: `Door`, `Lamp` en `MovingPlatform`. Een `Lever` of `PressButton` kent alleen een `target`. Zo kan één knop later ook iets anders aansturen, zonder dat we de knop aanpassen. Een `MovingPlatform` beweegt naar zijn `target` (`pointA` of `pointB`) en neemt een speler met de tag `Player` mee als die erop staat.
 
 `LightZone`, `DarkZone` en `HazardZone` erven van `Zone`. Ze checken allemaal of een speler in gevaar is, alleen met een andere regel. `HazardZone` is gevaarlijk voor beide vormen (stekels en afgrond).
 
