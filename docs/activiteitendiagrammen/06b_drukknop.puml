@@ -1,0 +1,29 @@
+@startuml 06b_drukknop
+title 06b – Drukknop en deur
+
+|Player|
+start
+:Speler gaat op de drukknop staan;
+|Lever / PressButton|
+:Knop ingedrukt;
+|Door|
+:Deur gaat open;
+|Lever / PressButton|
+while (Staat er nog een\nspeler op de knop?) is (ja)
+  |Door|
+  :Deur blijft open;
+  |Lever / PressButton|
+endwhile (nee)
+:Knop komt omhoog;
+|Door|
+while (Staat er een speler\nin de deuropening?) is (ja)
+  :Wachten met sluiten;
+endwhile (nee)
+:Deur gaat dicht;
+note right
+  De deur sluit nooit op een speler.
+  Samenwerken: de één blijft op de knop
+  staan terwijl de ander erdoor gaat.
+end note
+stop
+@enduml

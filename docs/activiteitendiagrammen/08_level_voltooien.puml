@@ -1,0 +1,45 @@
+@startuml 08_level_voltooien
+title 08 – Level voltooien
+
+|Player|
+start
+:Speler stapt in het portaal;
+|LevelManager|
+if (Staat de andere speler\nook in het portaal?) then (nee)
+  :Portaal licht half op\n(wacht op de andere speler);
+  stop
+else (ja)
+endif
+fork
+  :Besturing uitzetten;
+fork again
+  |SwapManager|
+  :Wissel-timer stoppen;
+end fork
+|LevelManager|
+:Tijd, kristallen en deaths verzamelen;
+|GameManager|
+:Level opslaan als 'gehaald';
+:Volgend level ontgrendelen;
+if (Betere tijd of meer kristallen\ndan opgeslagen?) then (ja)
+  :Beste resultaat lokaal opslaan;
+else (nee)
+endif
+|HUD / Menu|
+:HUD verbergen;
+:Winscherm tonen\n(tijd, kristallen, deaths);
+|GameManager|
+switch (Welke knop kiest de speler?)
+case (Volgend level)
+  if (Was dit het laatste level?) then (ja)
+    :Hoofdmenu laden;
+  else (nee)
+    :Volgend level laden (zie 00);
+  endif
+case (Opnieuw)
+  :Zelfde level opnieuw laden;
+case (Hoofdmenu)
+  :Hoofdmenu laden;
+endswitch
+stop
+@enduml

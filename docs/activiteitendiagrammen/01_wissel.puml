@@ -1,0 +1,53 @@
+@startuml 01_wissel
+title 01 – Wissel van vorm
+
+|SwapManager|
+start
+:Rondetijd bepalen\n(Level 1: 30 s, Level 2: 20 s);
+while (Level nog bezig?) is (ja)
+  :Timer = rondetijd;
+  :Waarschuwing = uit;
+  repeat
+    if (Spel gepauzeerd?) then (ja)
+      :Timer staat stil;
+    else (nee)
+      :Timer aftellen;
+      |HUD / Menu|
+      :Timerbalk en seconden bijwerken;
+      |SwapManager|
+      if (Timer <= 3 s en\nwaarschuwing nog uit?) then (ja)
+        :Waarschuwing = aan;
+        fork
+          :Piep afspelen;
+        fork again
+          |HUD / Menu|
+          :Timerbalk rood maken;
+          if (Knipperen aan\nin Opties?) then (ja)
+            :Scherm rustig laten knipperen;
+          else (nee)
+          endif
+        end fork
+      else (nee)
+      endif
+    endif
+    |SwapManager|
+  repeat while (Timer > 0?) is (ja)
+  -> nee;
+  fork
+    |Player|
+    :Lumo: licht <-> schaduw;
+  fork again
+    |Player|
+    :Nox: licht <-> schaduw;
+  fork again
+    |HUD / Menu|
+    :Vorm-iconen wisselen\n(zon <-> maan);
+  end fork
+  |Player|
+  :Krachten en zwaktes van\nde nieuwe vorm worden actief;
+  |LightZone / DarkZone|
+  :Controleren of een speler nu\nin de verkeerde zone staat (zie 02);
+  |SwapManager|
+endwhile (nee)
+stop
+@enduml

@@ -1,0 +1,33 @@
+@startuml 09_pauze
+title 09 – Pauzemenu
+
+|Player|
+start
+:Een van de spelers drukt op Esc;
+|GameManager|
+:Spel bevriezen (tijd staat stil);
+|SwapManager|
+:Wissel-timer pauzeren;
+|HUD / Menu|
+:HUD verbergen en spel wazig maken;
+:Pauzemenu tonen;
+while (Kiest de speler Opties?) is (ja)
+  :Optiesscherm tonen;
+  :Speler past instellingen aan\n(volume, knipperen);
+  |GameManager|
+  :Instellingen lokaal opslaan;
+  |HUD / Menu|
+  :Terug -> pauzemenu tonen;
+endwhile (nee)
+|GameManager|
+switch (Welke knop kiest de speler?)
+case (Verder of Esc)
+  :Pauzemenu sluiten en HUD tonen;
+  :Spel en wissel-timer hervatten;
+case (Opnieuw)
+  :Level opnieuw laden vanaf het begin\n(tijd, kristallen en deaths op 0);
+case (Hoofdmenu)
+  :Hoofdmenu laden\n(voortgang van dit level vervalt);
+endswitch
+stop
+@enduml

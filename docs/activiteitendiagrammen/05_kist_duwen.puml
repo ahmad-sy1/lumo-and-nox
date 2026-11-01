@@ -1,0 +1,30 @@
+@startuml 05_kist_duwen
+title 05 – Kist duwen (alleen Nox)
+
+|Player|
+start
+:Speler loopt tegen een kist aan;
+if (Is de speler Nox?) then (nee)
+  :Kist blijft staan\n(Lumo kan niet duwen);
+  stop
+else (ja)
+endif
+:Duw-animatie afspelen;
+|PushBox|
+repeat
+  :Kist schuift mee in de looprichting;
+  if (Kist staat in een lichtstraal?) then (ja)
+    |Lamp|
+    :Lichtstraal stopt bij de kist;
+    |LightZone / DarkZone|
+    :LightZone achter de kist uitzetten\n(daar is nu schaduw);
+  else (nee)
+    |LightZone / DarkZone|
+    :LightZone van de lamp\nweer volledig aanzetten;
+  endif
+  |PushBox|
+repeat while (Duwt Nox nog\nen is er ruimte?) is (ja)
+-> nee;
+:Kist blijft op zijn plek staan;
+stop
+@enduml

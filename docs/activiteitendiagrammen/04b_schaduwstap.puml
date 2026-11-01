@@ -1,0 +1,29 @@
+@startuml 04b_schaduwstap
+title 04b – Kracht in schaduw-vorm: Schaduwstap
+
+|Player|
+start
+:Speler houdt krachtknop ingedrukt\n(Lumo: S, Nox: pijltje omlaag);
+if (Is de speler in schaduw-vorm?) then (nee)
+  :Niets gebeurt\n(zie 04a voor licht-vorm);
+  stop
+else (ja)
+endif
+:Schaduwstap aan;
+|ShadowWall|
+:Schaduwmuren worden\ndoorloopbaar voor deze speler;
+|Player|
+repeat
+  :Speler beweegt, mag door schaduwmuren;
+repeat while (Knop nog ingedrukt en\nvorm nog schaduw?) is (ja)
+-> nee;
+:Schaduwstap uit;
+|ShadowWall|
+:Schaduwmuren weer dicht;
+if (Staat de speler\nnog in een muur?) then (ja)
+  |Player|
+  :Speler naar de dichtstbijzijnde\nvrije kant duwen;
+else (nee)
+endif
+stop
+@enduml

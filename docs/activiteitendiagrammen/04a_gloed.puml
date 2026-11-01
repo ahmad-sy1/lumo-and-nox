@@ -1,0 +1,29 @@
+@startuml 04a_gloed
+title 04a – Kracht in licht-vorm: Gloed
+
+|Player|
+start
+:Speler houdt krachtknop ingedrukt\n(Lumo: S, Nox: pijltje omlaag);
+if (Is de speler in licht-vorm?) then (nee)
+  :Niets gebeurt\n(zie 04b voor schaduw-vorm);
+  stop
+else (ja)
+endif
+:Gloed aan (licht om de speler);
+|LightPlatform|
+:Lichtplatforms in de buurt\nzichtbaar en betreedbaar maken;
+|Player|
+repeat
+  :Speler beweegt, Gloed blijft aan;
+repeat while (Knop nog ingedrukt en\nvorm nog licht?) is (ja)
+-> nee;
+:Gloed uit;
+|LightPlatform|
+:Lichtplatforms weer onzichtbaar\nen niet betreedbaar;
+|Player|
+if (Stond de speler\nop een lichtplatform?) then (ja)
+  :Speler valt;
+else (nee)
+endif
+stop
+@enduml

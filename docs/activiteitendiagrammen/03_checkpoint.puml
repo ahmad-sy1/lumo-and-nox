@@ -1,0 +1,25 @@
+@startuml 03_checkpoint
+title 03 – Checkpoint activeren
+
+|Player|
+start
+:Speler loopt langs de lantaarn;
+|Checkpoint|
+if (Lantaarn al aan?) then (ja)
+  :Niets doen;
+  stop
+else (nee)
+endif
+:Deze speler markeren als 'gepasseerd';
+if (Hebben beide spelers\nde lantaarn gepasseerd?) then (nee)
+  :Lantaarn gloeit zwak\n(wacht op de andere speler);
+  stop
+else (ja)
+endif
+:Lantaarn gaat branden;
+|LevelManager|
+:Checkpoint opslaan\nals nieuw respawnpunt;
+|SwapManager|
+:Wissel-timer opnieuw starten;
+stop
+@enduml

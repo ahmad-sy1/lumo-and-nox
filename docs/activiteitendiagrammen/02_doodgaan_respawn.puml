@@ -1,0 +1,41 @@
+@startuml 02_doodgaan_respawn
+title 02 – Doodgaan en respawnen
+
+|LightZone / DarkZone|
+start
+:Speler raakt een gevaar\nof er vindt een wissel plaats;
+if (Stekels of afgrond?) then (ja)
+elseif (Lichtstraal en speler\nin schaduw-vorm?) then (ja)
+elseif (Donkere poel en speler\nin licht-vorm?) then (ja)
+else (nee)
+  :Speler is veilig;
+  stop
+endif
+|Player|
+:Speler valt uit elkaar\nin vonkjes (licht) of rook (schaduw);
+|LevelManager|
+:Deaths + 1;
+:Besturing van beide spelers\nkort uitzetten;
+if (Is er een checkpoint\ngeactiveerd?) then (ja)
+  :Respawnpunt = laatste checkpoint;
+else (nee)
+  :Respawnpunt = startpunt;
+endif
+fork
+  |Player|
+  :Lumo naar respawnpunt,\nin licht-vorm;
+fork again
+  |Player|
+  :Nox naar respawnpunt,\nin schaduw-vorm;
+end fork
+note right
+  Je faalt samen:
+  als één speler doodgaat,
+  beginnen beide opnieuw.
+end note
+|SwapManager|
+:Wissel-timer opnieuw starten;
+|LevelManager|
+:Besturing weer aanzetten;
+stop
+@enduml

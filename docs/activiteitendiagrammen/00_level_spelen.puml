@@ -1,0 +1,42 @@
+@startuml 00_level_spelen
+title 00 – Een level spelen (overzicht)
+
+|GameManager|
+start
+:Level-scene laden;
+|LevelManager|
+:Tijd, deaths en kristallen op 0 zetten;
+:Respawnpunt = startpunt;
+fork
+  |Player|
+  :Lumo verschijnt in licht-vorm\nNox verschijnt in schaduw-vorm;
+fork again
+  |HUD / Menu|
+  :HUD tonen\n(timer, vorm-iconen, kristallen 0/3);
+end fork
+|SwapManager|
+:Wissel-timer starten (zie 01);
+fork
+  |Player|
+  repeat
+    :Invoer van beide spelers verwerken\n(lopen, springen, kracht, hendel);
+    note right
+      Details per actie:
+      02 doodgaan, 03 checkpoint,
+      04a gloed, 04b schaduwstap, 05 kist,
+      06a hendel, 06b drukknop,
+      07 kristal, 09 pauze
+    end note
+  repeat while (Staan beide spelers\ntegelijk in het portaal?) is (nee)
+  -> ja;
+fork again
+  |SwapManager|
+  repeat
+    :Timer aftellen en\nop tijd wisselen (zie 01);
+  repeat while (Level nog bezig?) is (ja)
+  -> nee;
+end fork
+|LevelManager|
+:Level voltooid (zie 08);
+stop
+@enduml

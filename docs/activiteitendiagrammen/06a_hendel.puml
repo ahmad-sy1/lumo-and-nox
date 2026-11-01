@@ -1,0 +1,23 @@
+@startuml 06a_hendel
+title 06a – Hendel gebruiken
+
+|Player|
+start
+:Speler staat bij een hendel en drukt\nop E (Lumo) of rechter Shift (Nox);
+|Lever / PressButton|
+:Hendel omzetten;
+if (Waar is de hendel\naan gekoppeld?) then (lamp)
+  |Lamp|
+  :Lamp aan of uit zetten;
+  |LightZone / DarkZone|
+  :LightZone van de lamp\naan of uit zetten;
+  note right
+    Lamp uit = schaduw,
+    dus veilig voor de schaduw-vorm.
+  end note
+else (deur)
+  |Door|
+  :Deur open of dicht;
+endif
+stop
+@enduml

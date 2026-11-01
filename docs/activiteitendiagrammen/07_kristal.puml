@@ -1,0 +1,23 @@
+@startuml 07_kristal
+title 07 – Kristal oppakken
+
+|Player|
+start
+:Speler raakt een kristal;
+|Crystal|
+if (Al opgepakt?) then (ja)
+  stop
+else (nee)
+endif
+:Kristal verdwijnt met een sprankel\nen geluidje;
+|LevelManager|
+:Kristallen + 1;
+|HUD / Menu|
+:Teller bijwerken (bijv. 1/3);
+note right
+  Een opgepakt kristal blijft
+  opgepakt, ook als de spelers
+  daarna doodgaan.
+end note
+stop
+@enduml
