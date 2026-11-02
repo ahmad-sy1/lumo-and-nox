@@ -12,6 +12,7 @@ public class LevelManager : MonoBehaviour
     private const float PlayerSpacing = 0.6f;
     private const int MaxCrystals = 3;
 
+    [SerializeField] private int levelIndex;
     [SerializeField] private Transform startPoint;
 
     private int deaths;
@@ -25,6 +26,7 @@ public class LevelManager : MonoBehaviour
     public int Deaths => deaths;
     public float ElapsedTime => elapsedTime;
     public int Crystals => crystals;
+    public bool IsFinished => isFinished;
 
     private void Awake()
     {
@@ -72,12 +74,18 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
-        // Alles stilzetten: besturing, wissel-timer en tijd. Het winscherm zet timeScale weer terug.
+        // Alles stilzetten: besturing, wissel-timer en tijd. De knoppen van het winscherm zetten timeScale terug.
         isFinished = true;
         Time.timeScale = 0f;
         Debug.Log($"LevelManager: level klaar! Tijd {elapsedTime:0.0} s, kristallen {crystals}/{MaxCrystals}, deaths {deaths}.", this);
 
-        // Het winscherm (issue #25) roept hier straks WinScreen.Show(elapsedTime, crystals, deaths) aan.
+        GameManager.Instance.SaveProgress(levelIndex, elapsedTime, crystals);
+
+        WinScreen winScreen = FindAnyObjectByType<WinScreen>();
+        if (winScreen != null)
+        {
+            winScreen.Show(levelIndex, elapsedTime, crystals, deaths);
+        }
     }
 
     private IEnumerator RespawnAfterDelay()

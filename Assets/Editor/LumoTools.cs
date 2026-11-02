@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 /// <summary>
 /// Menu "Lumo & Nox": maakt prefabs en de Sandbox-scene vanuit code, zodat we .prefab en .unity
@@ -42,6 +43,7 @@ public static class LumoTools
         BuildCrystal();
         BuildExitPortal();
         BuildGameManager();
+        BuildWinScreen();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -115,6 +117,10 @@ public static class LumoTools
 
         // #22: GameManager (blijft bestaan tussen scenes, beheert save.json).
         PlacePrefab("GameManager", Vector2.zero);
+
+        // #25: winscherm (verschijnt bij FinishLevel) en een EventSystem voor de knoppen.
+        PlacePrefab("WinScreen", Vector2.zero);
+        UiBuilder.CreateEventSystem();
 
         // #11: de echte spelers. De PlayerDummy-prefab blijft bestaan voor losse tests.
         PlacePrefab("Lumo", new Vector2(-14f, FloorTop + 1f));
@@ -292,6 +298,53 @@ public static class LumoTools
         var gameManager = new GameObject("GameManager");
         gameManager.AddComponent<GameManager>();
         SavePrefab(gameManager, "GameManager");
+    }
+
+    private static void BuildWinScreen()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("WinScreen", 20);
+        WinScreen script = canvas.gameObject.AddComponent<WinScreen>();
+        GameObject panel = UiBuilder.CreateFullPanel(canvas.transform, "Panel", new Color(Palette.nachtS.r, Palette.nachtS.g, Palette.nachtS.b, 0.92f));
+        Transform p = panel.transform;
+
+        UiBuilder.CreateText(p, "Title", "Level voltooid!", UiBuilder.TitleText, Palette.goud, new Vector2(0f, 360f), new Vector2(1600f, 140f), bold: true);
+        Text levelText = UiBuilder.CreateText(p, "Level", "Level 1", UiBuilder.NormalText, Palette.steen, new Vector2(0f, 250f), new Vector2(1200f, 60f));
+
+        Text timeText = CreateStatCard(p, "Tijd", -560f);
+        Text deathText = CreateStatCard(p, "Keer doodgegaan", 560f);
+
+        // Kristallen: drie iconen en x/3.
+        GameObject crystalCard = UiBuilder.CreateImage(p, "Kristallen", Palette.nachtL, new Vector2(0f, 40f), new Vector2(480f, 260f));
+        UiBuilder.CreateText(crystalCard.transform, "Label", "Kristallen", UiBuilder.SmallText, Palette.steenS, new Vector2(0f, 85f), new Vector2(460f, 50f));
+        var icons = new Image[3];
+        for (int i = 0; i < icons.Length; i++)
+        {
+            GameObject icon = UiBuilder.CreateImage(crystalCard.transform, "Kristal" + i, Color.white, new Vector2((i - 1) * 90f, 5f), new Vector2(72f, 72f));
+            icons[i] = icon.GetComponent<Image>();
+            icons[i].sprite = LoadTile("kristal");
+        }
+        Text crystalText = UiBuilder.CreateText(crystalCard.transform, "Value", "0/3", UiBuilder.NormalText, Palette.steenH, new Vector2(0f, -85f), new Vector2(460f, 60f), bold: true);
+
+        Button next = UiBuilder.CreateButton(p, "Volgend level", "Volgend level", new Vector2(-560f, -220f), new Vector2(520f, 100f), script.NextLevel);
+        UiBuilder.CreateButton(p, "Opnieuw", "Opnieuw", new Vector2(0f, -220f), new Vector2(480f, 100f), script.Restart);
+        UiBuilder.CreateButton(p, "Hoofdmenu", "Hoofdmenu", new Vector2(560f, -220f), new Vector2(480f, 100f), script.GoToMainMenu);
+
+        SetField(script, "panel", panel);
+        SetField(script, "levelText", levelText);
+        SetField(script, "timeText", timeText);
+        SetField(script, "crystalText", crystalText);
+        SetField(script, "deathText", deathText);
+        SetField(script, "nextButton", next);
+        SetArray(script, "crystalIcons", icons);
+
+        SavePrefab(canvas.gameObject, "WinScreen");
+    }
+
+    private static Text CreateStatCard(Transform parent, string label, float x)
+    {
+        GameObject card = UiBuilder.CreateImage(parent, label, Palette.nachtL, new Vector2(x, 40f), new Vector2(480f, 260f));
+        UiBuilder.CreateText(card.transform, "Label", label, UiBuilder.SmallText, Palette.steenS, new Vector2(0f, 85f), new Vector2(460f, 50f));
+        return UiBuilder.CreateText(card.transform, "Value", "-", UiBuilder.LargeText, Palette.steenH, new Vector2(0f, -10f), new Vector2(460f, 100f), bold: true);
     }
 
     private static void BuildLevelManager()
@@ -494,6 +547,18 @@ public static class LumoTools
     {
         var serialized = new SerializedObject(target);
         serialized.FindProperty(field).objectReferenceValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetArray(Object target, string field, Object[] values)
+    {
+        var serialized = new SerializedObject(target);
+        SerializedProperty array = serialized.FindProperty(field);
+        array.arraySize = values.Length;
+        for (int i = 0; i < values.Length; i++)
+        {
+            array.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+        }
         serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 

@@ -168,6 +168,7 @@ class ExitPortal <<MonoBehaviour>> {
 }
 
 class LevelManager <<MonoBehaviour>> {
+  - levelIndex : int
   - startPoint : Transform
   - deaths : int
   - elapsedTime : float
@@ -196,6 +197,7 @@ class GameManager <<MonoBehaviour>> {
   + SaveProgress(levelIndex : int, time : float, crystals : int) : void
   + SaveSettings() : void
   + ApplySettings() : void
+  + {static} FormatTime(seconds : float) : string
   + IsUnlocked(levelIndex : int) : bool
   + FirstUnfinishedLevel() : int
 }
@@ -231,11 +233,17 @@ class OptionsMenu <<MonoBehaviour>> {
 }
 
 class WinScreen <<MonoBehaviour>> {
-  - timeText : TextMeshProUGUI
-  - crystalText : TextMeshProUGUI
-  - deathText : TextMeshProUGUI
-  + Show(time : float, crystals : int, deaths : int) : void
+  - panel : GameObject
+  - levelText : Text
+  - timeText : Text
+  - crystalText : Text
+  - deathText : Text
+  - crystalIcons : Image[]
+  - nextButton : Button
+  + Show(levelIndex : int, time : float, crystals : int, deaths : int) : void
   + NextLevel() : void
+  + Restart() : void
+  + GoToMainMenu() : void
 }
 
 class SaveData {
@@ -295,6 +303,7 @@ PressButton ..> "0..*" PushBox : telt mee
 HUD --> "1" SwapManager
 HUD --> "1" LevelManager
 LevelManager --> "1" WinScreen
+LevelManager ..> "1" GameManager : SaveProgress()
 MainMenu ..> "1" GameManager
 PauseMenu ..> "1" GameManager
 WinScreen ..> "1" GameManager
