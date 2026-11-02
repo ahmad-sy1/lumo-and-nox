@@ -41,6 +41,7 @@ public static class LumoTools
         BuildLevelManager();
         BuildCrystal();
         BuildExitPortal();
+        BuildGameManager();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -111,6 +112,9 @@ public static class LumoTools
         PlacePrefab("Crystal", new Vector2(2f, FloorTop + 4f), "Crystal 2");
         PlacePrefab("Crystal", new Vector2(8f, FloorTop + 7f), "Crystal 3");
         PlacePrefab("ExitPortal", new Vector2(13.5f, FloorTop + 1f));
+
+        // #22: GameManager (blijft bestaan tussen scenes, beheert save.json).
+        PlacePrefab("GameManager", Vector2.zero);
 
         // #11: de echte spelers. De PlayerDummy-prefab blijft bestaan voor losse tests.
         PlacePrefab("Lumo", new Vector2(-14f, FloorTop + 1f));
@@ -281,6 +285,13 @@ public static class LumoTools
         renderer.color = new Color(0.6f, 0.6f, 0.6f);
         portal.AddComponent<ExitPortal>();
         SavePrefab(portal, "ExitPortal");
+    }
+
+    private static void BuildGameManager()
+    {
+        var gameManager = new GameObject("GameManager");
+        gameManager.AddComponent<GameManager>();
+        SavePrefab(gameManager, "GameManager");
     }
 
     private static void BuildLevelManager()
