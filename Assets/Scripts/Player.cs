@@ -53,13 +53,11 @@ public class Player : MonoBehaviour, IPlayer
         // Zonder wrijving blijf je niet aan een muur plakken als je ertegenaan springt.
         box.sharedMaterial = new PhysicsMaterial2D { friction = 0f, bounciness = 0f };
 
-        groundFilter = new ContactFilter2D();
-        groundFilter.NoFilter();
+        groundFilter = ContactFilter2D.noFilter;
         groundFilter.useTriggers = false;
 
         // Een hendel heeft een trigger als bereik, dus hier tellen triggers wel mee.
-        interactFilter = new ContactFilter2D();
-        interactFilter.NoFilter();
+        interactFilter = ContactFilter2D.noFilter;
     }
 
     private void Update()
