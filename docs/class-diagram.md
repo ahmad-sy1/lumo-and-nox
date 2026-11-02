@@ -4,7 +4,7 @@
 
 ![Klassendiagram](diagrams/class-diagram.svg)
 
-We maken één klasse `Player`. Lumo en Nox zijn twee spelers met andere instellingen: Lumo heeft een hogere `jumpForce` en Nox heeft `canPushBoxes` aan. Zo hoeven we niets dubbel te schrijven. Met `controls` kies je de toetsen: Lumo gebruikt `Wasd`, Nox gebruikt `Arrows`.
+We maken één klasse `Player`. Lumo en Nox zijn twee spelers met andere instellingen: Lumo heeft een hogere `jumpForce` en Nox heeft `canPushBoxes` aan. Zo hoeven we niets dubbel te schrijven. Met `controls` kies je de toetsen: Lumo gebruikt `Wasd`, Nox gebruikt `Arrows`. De `SwapManager` wisselt de vorm met `SetShape()`. Met `UseAbility()` (krachtknop ingedrukt) gebruikt de speler Gloed in licht-vorm of Schaduwstap in schaduw-vorm. `StopAbility()` zet de kracht weer uit.
 
 Een speler gebruikt een `Lever` met `Interact()`. De `Lever` krijgt dan een `Use()`-aanroep.
 

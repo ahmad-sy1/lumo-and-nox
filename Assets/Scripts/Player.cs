@@ -2,8 +2,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Lopen en springen voor één speler. Lumo en Nox zijn twee instanties met andere instellingen:
-/// Lumo springt hoger (jumpForce), bij Nox staat canPushBoxes aan.
+/// Lopen, springen en de kracht van de huidige vorm voor één speler. Lumo en Nox zijn twee instanties
+/// met andere instellingen: Lumo springt hoger (jumpForce), bij Nox staat canPushBoxes aan.
+/// Licht-vorm: Gloed maakt LightPlatforms in de buurt zichtbaar. Schaduw-vorm: Schaduwstap laat de speler
+/// door ShadowWalls lopen. De kracht is aan zolang de krachtknop ingedrukt is.
 /// Zones en de LevelManager kennen de speler alleen via IPlayer (zie docs/afspraken-player.md).
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
@@ -19,6 +21,9 @@ public class Player : MonoBehaviour, IPlayer
 
     [SerializeField] private Controls controls;
     [SerializeField] private Shape startShape;
+    [SerializeField] private Sprite lightSprite;
+    [SerializeField] private Sprite shadowSprite;
+    [SerializeField] private float glowRadius = 4f;
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private float jumpForce = 12f;
     [SerializeField] private bool canPushBoxes;
@@ -30,6 +35,10 @@ public class Player : MonoBehaviour, IPlayer
     private ContactFilter2D interactFilter;
     private readonly Collider2D[] groundHits = new Collider2D[4];
     private readonly Collider2D[] interactHits = new Collider2D[8];
+    private LightPlatform[] lightPlatforms;
+    private bool[] glowing;
+    private ShadowWall[] shadowWalls;
+    private bool isUsingAbility;
     private Shape shape;
     private bool isDead;
     private bool isGrounded;
@@ -58,6 +67,15 @@ public class Player : MonoBehaviour, IPlayer
 
         // Een hendel heeft een trigger als bereik, dus hier tellen triggers wel mee.
         interactFilter = ContactFilter2D.noFilter;
+
+        ApplySprite();
+    }
+
+    private void Start()
+    {
+        lightPlatforms = FindObjectsByType<LightPlatform>();
+        glowing = new bool[lightPlatforms.Length];
+        shadowWalls = FindObjectsByType<ShadowWall>();
     }
 
     private void Update()
@@ -73,6 +91,7 @@ public class Player : MonoBehaviour, IPlayer
         bool jump = controls == Controls.Wasd ? keyboard.wKey.wasPressedThisFrame : keyboard.upArrowKey.wasPressedThisFrame;
 
         bool interact = controls == Controls.Wasd ? keyboard.eKey.wasPressedThisFrame : keyboard.rightShiftKey.wasPressedThisFrame;
+        bool ability = controls == Controls.Wasd ? keyboard.sKey.isPressed : keyboard.downArrowKey.isPressed;
 
         Move((right ? 1f : 0f) - (left ? 1f : 0f));
 
@@ -85,12 +104,26 @@ public class Player : MonoBehaviour, IPlayer
         {
             Interact();
         }
+
+        if (ability && !isUsingAbility)
+        {
+            UseAbility();
+        }
+        else if (!ability && isUsingAbility)
+        {
+            StopAbility();
+        }
     }
 
     private void FixedUpdate()
     {
         UpdateGrounded();
         body.linearVelocity = new Vector2(moveInput * moveSpeed, body.linearVelocity.y);
+
+        if (isUsingAbility && shape == Shape.Light)
+        {
+            UpdateGlow();
+        }
     }
 
     /// <summary>
@@ -145,6 +178,69 @@ public class Player : MonoBehaviour, IPlayer
     }
 
     /// <summary>
+    /// Zet de kracht van de huidige vorm aan. Blijft aan tot StopAbility() of een andere vorm.
+    /// </summary>
+    public void UseAbility()
+    {
+        if (isDead || isUsingAbility)
+        {
+            return;
+        }
+
+        isUsingAbility = true;
+
+        if (shape == Shape.Shadow)
+        {
+            foreach (ShadowWall wall in shadowWalls)
+            {
+                wall.SetPassable(box, true);
+            }
+        }
+    }
+
+    public void StopAbility()
+    {
+        if (!isUsingAbility)
+        {
+            return;
+        }
+
+        isUsingAbility = false;
+
+        if (shape == Shape.Light)
+        {
+            for (int i = 0; i < lightPlatforms.Length; i++)
+            {
+                if (glowing[i])
+                {
+                    glowing[i] = false;
+                    lightPlatforms[i].SetRevealed(false);
+                }
+            }
+        }
+        else
+        {
+            foreach (ShadowWall wall in shadowWalls)
+            {
+                wall.SetPassable(box, false);
+            }
+
+            PushOutOfWalls();
+        }
+    }
+
+    /// <summary>
+    /// Wissel van vorm (door de SwapManager). De kracht van de oude vorm gaat uit. Houden we de knop nog
+    /// ingedrukt, dan start de kracht van de nieuwe vorm vanzelf.
+    /// </summary>
+    public void SetShape(Shape newShape)
+    {
+        StopAbility();
+        shape = newShape;
+        ApplySprite();
+    }
+
+    /// <summary>
     /// Mag vaker achter elkaar aangeroepen worden, zones doen dat elke physics-stap.
     /// </summary>
     public void Die()
@@ -154,6 +250,7 @@ public class Player : MonoBehaviour, IPlayer
             return;
         }
 
+        StopAbility();
         isDead = true;
         moveInput = 0f;
         spriteRenderer.color = Color.gray;
@@ -171,9 +268,64 @@ public class Player : MonoBehaviour, IPlayer
         transform.position = position;
         body.linearVelocity = Vector2.zero;
 
-        shape = startShape;
         isDead = false;
         spriteRenderer.color = Color.white;
+        SetShape(startShape);
+    }
+
+    private void ApplySprite()
+    {
+        Sprite sprite = shape == Shape.Light ? lightSprite : shadowSprite;
+
+        if (sprite != null)
+        {
+            spriteRenderer.sprite = sprite;
+        }
+    }
+
+    // Gloed: platforms binnen de straal zijn zichtbaar en betreedbaar, de rest niet.
+    private void UpdateGlow()
+    {
+        for (int i = 0; i < lightPlatforms.Length; i++)
+        {
+            Vector2 offset = lightPlatforms[i].transform.position - transform.position;
+            bool inRange = offset.sqrMagnitude <= glowRadius * glowRadius;
+
+            if (inRange != glowing[i])
+            {
+                glowing[i] = inRange;
+                lightPlatforms[i].SetRevealed(inRange);
+            }
+        }
+    }
+
+    // Staan we na Schaduwstap nog in een muur, dan duwen we de speler naar de dichtstbijzijnde vrije kant.
+    private void PushOutOfWalls()
+    {
+        foreach (ShadowWall wall in shadowWalls)
+        {
+            Collider2D wallCollider = wall.GetComponent<Collider2D>();
+
+            if (!box.Distance(wallCollider).isOverlapped)
+            {
+                continue;
+            }
+
+            Bounds playerBounds = box.bounds;
+            Bounds wallBounds = wallCollider.bounds;
+            float toLeft = playerBounds.max.x - wallBounds.min.x;
+            float toRight = wallBounds.max.x - playerBounds.min.x;
+            float push = toLeft < toRight ? -(toLeft + 0.01f) : toRight + 0.01f;
+
+            body.position += new Vector2(push, 0f);
+            transform.position = body.position;
+        }
+    }
+
+    [ContextMenu("Test: wissel vorm")]
+    private void TestSwapShape()
+    {
+        SetShape(shape == Shape.Light ? Shape.Shadow : Shape.Light);
     }
 
     // Een smalle strook net onder de voeten: raakt die iets dat geen trigger is, dan staan we op de grond.
