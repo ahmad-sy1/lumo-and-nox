@@ -1,22 +1,13 @@
-# Inleveringen
+# Inlevering ontwerpen – Ahmad
 
-Na elke fase (ontwerpen, realiseren, testen) leveren we een oefenbeoordeling in. Die doen we met de SD Examentrainer. Per fase bewaren we hier het inleverblok en de antwoorden op de drie vragen.
+Hackathon 3, opdracht "k1w2 - ontwerpen". Werkproces B1-K1-W2 Ontwerpt software.
+Deadline: 19 oktober 2026. Oefenbeoordeling met de SD Examentrainer.
 
 > Dit is oefenmateriaal. De examinator bepaalt het werkelijke resultaat.
 
-| Fase | Werkproces | Deadline | Score | Status |
-| --- | --- | --- | --- | --- |
-| Ontwerpen | B1-K1-W2 Ontwerpt software | 19 oktober 2026 | 8 van 9 | Beoordeeld |
-| Realiseren | | | | Nog niet gedaan |
-| Testen | | | | Nog niet gedaan |
-
----
-
-## Fase 1: Ontwerpen (B1-K1-W2)
-
 Beoordeeld op 2 november 2026, versie `main`, commit `9be11bd`.
 
-### Scores
+## Scores
 
 | Criterium | Score | Niveau |
 | --- | --- | --- |
@@ -25,14 +16,14 @@ Beoordeeld op 2 november 2026, versie `main`, commit `9be11bd`.
 | Onderbouwing (cruciaal) | 2/3 | Grotendeels |
 | **Totaal** | **8 van 9** | **Indicatiecijfer 9.0** |
 
-### Feedback in het kort
+## Feedback in het kort
 
 - **Ontwerp:** 16 van 18 functionaliteiten zitten in de schema's (89%). Mist: levelschets van level 2 en de bewegende lampen in de klasse `Lamp`.
 - **Schematechnieken:** data, gebruiker en logica hebben elk een passend schema. Tip: Gloed en Schaduwstap zijn varianten van "Kracht gebruiken". Daar hoort een generalisatie-pijl bij, geen `<<extend>>`.
 - **Onderbouwing:** niet elke keuze heeft een "waarom". Geen uitleg bij: geen levens, 3 kristallen, toetsindeling, level select en menu-opbouw. Security is dun.
 - **Los van de score:** maak een genummerde eisenlijst, zodat een examinator kan tellen.
 
-### Inleverblok
+## Inleverblok
 
 ```
 SD EXAMENTRAINER — OEFENBEOORDELING
@@ -73,7 +64,7 @@ Verbetersuggestie:
 Dit is oefenmateriaal. De examinator bepaalt het werkelijke resultaat.
 ```
 
-### Antwoorden
+## Antwoorden
 
 **Welk bewijs had je nodig, en wat had je niet bij de hand?**
 Ik had het ontwerpdocument, het klassendiagram, de use cases, de wireframes en de activiteitendiagrammen nodig. Een genummerde eisenlijst en een levelschets van level 2 had ik niet, daarom is de telling een schatting.
@@ -84,7 +75,7 @@ Ja. De schema's zijn compleet, maar bij een paar keuzes staat wel wát we doen e
 **Wat ga je veranderen?**
 Ik zet bij elke keuze zonder uitleg waarom we het zo doen en wat het alternatief was, en ik schrijf iets over security rond `save.json`. Ook maak ik een genummerde eisenlijst en een levelschets van level 2.
 
-### Wat we nog doen
+## Wat we nog doen
 
 - [ ] Onderbouwing toevoegen: geen levens, 3 kristallen, toetsindeling, level select, menu-opbouw
 - [ ] Security: wat gebeurt er als iemand `save.json` zelf aanpast
@@ -92,15 +83,3 @@ Ik zet bij elke keuze zonder uitleg waarom we het zo doen en wat het alternatief
 - [ ] Levelschets level 2 in `docs/wireframes/`
 - [ ] Bewegende lampen in klasse `Lamp`
 - [ ] Generalisatie-pijl voor Gloed en Schaduwstap in het use case diagram
-
----
-
-## Fase 2: Realiseren
-
-Nog niet gedaan.
-
----
-
-## Fase 3: Testen
-
-Nog niet gedaan.
