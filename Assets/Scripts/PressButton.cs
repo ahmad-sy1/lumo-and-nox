@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Drukknop: het target staat aan zolang er een speler (tag "Player") op staat, en gaat uit
-/// als er niemand meer op staat.
+/// Drukknop: het target staat aan zolang er een speler (tag "Player") of een kist op staat,
+/// en gaat uit als er niets meer op staat.
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public class PressButton : MonoBehaviour
@@ -39,7 +39,7 @@ public class PressButton : MonoBehaviour
 
     private bool CanPress(Collider2D other)
     {
-        return other.CompareTag("Player");
+        return other.CompareTag("Player") || other.GetComponent<PushBox>() != null;
     }
 
     private void UpdateState()

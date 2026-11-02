@@ -260,5 +260,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Lamp
   isOn: 1
   beam: {fileID: 1053008658844241584}
+  maxBeamLength: 6
   onSprite: {fileID: 21300000, guid: b3afa15085ac0457fb47bb93600a76a6, type: 3}
   offSprite: {fileID: 21300000, guid: ea9119994411e4e6cb9e480c76d6de6b, type: 3}

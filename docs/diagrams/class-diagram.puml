@@ -73,6 +73,7 @@ abstract class Activatable <<MonoBehaviour>> {
 
 class Lamp <<MonoBehaviour>> {
   - isOn : bool
+  - maxBeamLength : float
   - onSprite : Sprite
   - offSprite : Sprite
   + Activate() : void
@@ -117,16 +118,20 @@ class PressButton <<MonoBehaviour>> {
 
 class LightPlatform <<MonoBehaviour>> {
   - isRevealed : bool
+  - revealedSprite : Sprite
+  - hiddenSprite : Sprite
   + SetRevealed(revealed : bool) : void
 }
 
 class ShadowWall <<MonoBehaviour>> {
   - isPassable : bool
-  + SetPassable(passable : bool) : void
+  - passingPlayers : HashSet<Collider2D>
+  + SetPassable(player : Collider2D, passable : bool) : void
 }
 
 class PushBox <<MonoBehaviour>> {
   - body : Rigidbody2D
+  - pushSpeed : float
   + Push(direction : Vector2) : void
 }
 
@@ -252,6 +257,8 @@ ExitPortal --> "1" LevelManager : FinishLevel()
 Lever "0..*" --> "1" Activatable : target
 PressButton "0..*" --> "1" Activatable : target
 Lamp *-- "1" LightZone : beam
+Lamp ..> "0..*" PushBox : straal stopt bij kist
+PressButton ..> "0..*" PushBox : telt mee
 
 ' UI
 HUD --> "1" SwapManager
