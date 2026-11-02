@@ -35,3 +35,4 @@ Het volledige ontwerp staat in `docs/design.md`. Lees dat eerst als je iets over
 - Werk per taak op een eigen branch (bijvoorbeeld `feature/swap-manager`).
 - Commit-berichten in het Engels, kort.
 - Push niet zonder het eerst te vragen.
+- Zet Claude nergens neer: geen `Co-Authored-By`, geen "Generated with Claude Code" in commits, PR's of issues.
