@@ -31,21 +31,39 @@ class SwapManager <<MonoBehaviour>> {
   - Swap() : void
 }
 
+interface IPlayer {
+  + CurrentShape : Shape
+  + Die() : void
+  + Respawn(position : Vector2) : void
+}
+
+class PlayerDummy <<MonoBehaviour>> {
+  - startShape : Shape
+  - isDead : bool
+}
+
+note bottom of PlayerDummy
+  alleen voor testen in de Sandbox
+end note
+
 abstract class Zone <<MonoBehaviour>> {
-  + {abstract} IsDangerousFor(player : Player) : bool
-  # OnTriggerStay2D(other : Collider2D) : void
+  - playersInside : HashSet<Collider2D>
+  + {abstract} IsDangerousFor(shape : Shape) : bool
+  # OnTriggerEnter2D(other : Collider2D) : void
+  # OnTriggerExit2D(other : Collider2D) : void
+  - FixedUpdate() : void
 }
 
 class LightZone <<MonoBehaviour>> {
-  + IsDangerousFor(player : Player) : bool
+  + IsDangerousFor(shape : Shape) : bool
 }
 
 class DarkZone <<MonoBehaviour>> {
-  + IsDangerousFor(player : Player) : bool
+  + IsDangerousFor(shape : Shape) : bool
 }
 
 class HazardZone <<MonoBehaviour>> {
-  + IsDangerousFor(player : Player) : bool
+  + IsDangerousFor(shape : Shape) : bool
 }
 
 abstract class Activatable <<MonoBehaviour>> {
@@ -215,7 +233,9 @@ Player ..> "0..*" PushBox : duwt
 Player ..> "0..*" LightPlatform : Gloed
 Player ..> "0..*" ShadowWall : Schaduwstap
 Player ..> "0..*" Lever : Use()
-Zone ..> "0..*" Player : checkt
+Zone ..> "0..*" IPlayer : checkt
+IPlayer <|.. Player
+IPlayer <|.. PlayerDummy
 
 ' Wissel en level
 SwapManager --> "2" Player : players

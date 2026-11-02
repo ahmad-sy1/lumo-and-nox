@@ -10,7 +10,9 @@ Een speler gebruikt een `Lever` met `Interact()`. De `Lever` krijgt dan een `Use
 
 Alles wat je aan en uit kunt zetten erft van `Activatable`: `Door`, `Lamp` en `MovingPlatform`. Een `Lever` of `PressButton` kent alleen een `target`. Zo kan één knop later ook iets anders aansturen, zonder dat we de knop aanpassen. `Door` en `Lamp` wisselen hun plaatje mee (open/dicht, aan/uit). Een `Lever` wisselt zijn target bij elke `Use()`. Een `PressButton` telt hoeveel spelers erop staan en houdt zijn target aan zolang dat er meer dan nul zijn. Een `MovingPlatform` beweegt naar zijn `target` (`pointA` of `pointB`) en neemt een speler met de tag `Player` mee als die erop staat.
 
-`LightZone`, `DarkZone` en `HazardZone` erven van `Zone`. Ze checken allemaal of een speler in gevaar is, alleen met een andere regel. `HazardZone` is gevaarlijk voor beide vormen (stekels en afgrond).
+`LightZone`, `DarkZone` en `HazardZone` erven van `Zone`. Ze checken allemaal of een speler in gevaar is, alleen met een andere regel. `HazardZone` is gevaarlijk voor beide vormen (stekels en afgrond). Een zone onthoudt welke spelers erin staan en checkt elke physics-stap opnieuw. Zo gaat een speler ook dood als hij stilstaat en de wissel komt.
+
+Zones en de `LevelManager` kennen de `Player` alleen via de interface `IPlayer` (`CurrentShape`, `Die()`, `Respawn()`). Zo kunnen Osama en Ahmad los van elkaar bouwen; zie `docs/afspraken-player.md`. `PlayerDummy` implementeert `IPlayer` ook. Hij is alleen om te testen in de Sandbox, zolang er nog geen `Player` is.
 
 De `LevelManager` is het centrum van een level. `Player`, `Checkpoint`, `Crystal` en `ExitPortal` roepen hem aan als er iets gebeurt. Hij onthoudt het `currentCheckpoint`, telt doden en kristallen en toont het `WinScreen`. De `SwapManager` kent beide spelers en wisselt hun vorm. De `GameManager` laadt met `LoadProgress()` de `SaveData` (zie het data-model).
 

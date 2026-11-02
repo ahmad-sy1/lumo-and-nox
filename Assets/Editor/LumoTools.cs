@@ -29,6 +29,9 @@ public static class LumoTools
         BuildMovingPlatform();
         BuildLever();
         BuildPressButton();
+        BuildZone<HazardZone>("HazardZone", "stekels", 2);
+        BuildZone<DarkZone>("DarkZone", "donkere_poel", 2);
+        BuildPlayerDummy();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -73,9 +76,21 @@ public static class LumoTools
         GameObject button = PlacePrefab("PressButton", new Vector2(-8.5f, FloorTop + 0.5f));
         SetField(button.GetComponent<PressButton>(), "target", buttonDoor.GetComponent<Door>());
 
-        // #16: lamp en bewegend platform.
+        // #16: lamp en bewegend platform. #18: de straal van de lamp is een LightZone.
         PlacePrefab("Lamp", new Vector2(-4f, FloorTop + 6.5f));
         PlacePrefab("MovingPlatform", new Vector2(8f, FloorTop + 5f));
+
+        // #18: zones en twee test-spelers.
+        PlacePrefab("DarkZone", new Vector2(2f, FloorTop + 0.5f));
+        PlacePrefab("HazardZone", new Vector2(5f, FloorTop + 0.5f));
+        PlaceDummy("Dummy Lumo", Shape.Light, new Vector2(-14f, FloorTop + 0.75f));
+        PlaceDummy("Dummy Nox", Shape.Shadow, new Vector2(-13f, FloorTop + 0.75f));
+    }
+
+    private static void PlaceDummy(string name, Shape shape, Vector2 position)
+    {
+        GameObject dummy = PlacePrefab("PlayerDummy", position, name);
+        SetEnum(dummy.GetComponent<PlayerDummy>(), "startShape", (int)shape);
     }
 
     // ---------- Prefabs ----------
@@ -105,6 +120,7 @@ public static class LumoTools
         beam.transform.localPosition = new Vector3(0f, -0.5f - beamLength / 2f, 0f);
         beam.transform.localScale = new Vector3(1f, beamLength, 1f);
         AddSprite(beam, "lichtstraal");
+        beam.AddComponent<LightZone>();
 
         Lamp script = lamp.AddComponent<Lamp>();
         SetField(script, "beam", beam);
@@ -175,6 +191,43 @@ public static class LumoTools
         SetField(script, "downSprite", LoadTile("drukknop_ingedrukt"));
 
         SavePrefab(button, "PressButton");
+    }
+
+    private static void BuildZone<T>(string name, string tile, int width) where T : Zone
+    {
+        var zone = new GameObject(name);
+        for (int i = 0; i < width; i++)
+        {
+            var part = new GameObject("Tile" + i);
+            part.transform.SetParent(zone.transform, false);
+            part.transform.localPosition = new Vector3(i - (width - 1) / 2f, 0f, 0f);
+            AddSprite(part, tile);
+        }
+
+        zone.AddComponent<T>();
+        Bounds bounds = LoadTile(tile).bounds;
+        var collider = zone.GetComponent<BoxCollider2D>();
+        collider.size = new Vector2(width, bounds.size.y);
+        collider.offset = new Vector2(0f, bounds.center.y);
+        collider.isTrigger = true;
+
+        SavePrefab(zone, name);
+    }
+
+    private static void BuildPlayerDummy()
+    {
+        var dummy = new GameObject("PlayerDummy");
+        dummy.tag = "Player";
+        dummy.transform.localScale = new Vector3(0.8f, 1.5f, 1f);
+
+        SpriteRenderer renderer = dummy.AddComponent<SpriteRenderer>();
+        renderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(SquareSpritePath);
+        renderer.sortingOrder = 5;
+
+        dummy.AddComponent<PlayerDummy>();
+        dummy.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+
+        SavePrefab(dummy, "PlayerDummy");
     }
 
     // ---------- Sandbox ----------
@@ -301,6 +354,13 @@ public static class LumoTools
     {
         var serialized = new SerializedObject(target);
         serialized.FindProperty(field).objectReferenceValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetEnum(Object target, string field, int value)
+    {
+        var serialized = new SerializedObject(target);
+        serialized.FindProperty(field).enumValueIndex = value;
         serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
