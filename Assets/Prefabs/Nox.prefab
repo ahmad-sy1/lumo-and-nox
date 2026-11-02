@@ -182,6 +182,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   controls: 1
   startShape: 1
+  lightSprite: {fileID: 4866434302554253442, guid: e663f44b107c94a489328d7dea17b14b, type: 3}
+  shadowSprite: {fileID: 4788160495906702735, guid: 74e0853e0e42245f88e2bca1ce7f04d4, type: 3}
+  glowRadius: 4
   moveSpeed: 6
   jumpForce: 12
   canPushBoxes: 1
