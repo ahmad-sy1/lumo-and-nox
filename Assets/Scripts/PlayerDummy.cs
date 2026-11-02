@@ -32,6 +32,12 @@ public class PlayerDummy : MonoBehaviour, IPlayer
         isDead = true;
         Debug.Log($"{name} is dood ({shape}).", this);
         UpdateColor();
+
+        LevelManager levelManager = FindAnyObjectByType<LevelManager>();
+        if (levelManager != null)
+        {
+            levelManager.OnPlayerDied();
+        }
     }
 
     public void Respawn(Vector2 position)
