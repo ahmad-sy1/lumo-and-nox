@@ -35,6 +35,8 @@ public static class LumoTools
         BuildZone<HazardZone>("HazardZone", "stekels", 2);
         BuildZone<DarkZone>("DarkZone", "donkere_poel", 2);
         BuildPlayerDummy();
+        BuildPlayer("Lumo", "lumo_schaduw_sheet", Player.Controls.Wasd, Shape.Light, 14f, false);
+        BuildPlayer("Nox", "nox_schaduw_sheet", Player.Controls.Arrows, Shape.Shadow, 12f, true);
         BuildLightPlatform();
         BuildShadowWall();
         BuildPushBox();
@@ -162,15 +164,9 @@ public static class LumoTools
         GameObject pause = PlacePrefab("PauseMenu", Vector2.zero);
         SetField(pause.GetComponent<PauseMenu>(), "optionsMenu", options.GetComponent<OptionsMenu>());
 
-        // #18: twee test-spelers.
-        PlaceDummy("Dummy Lumo", Shape.Light, new Vector2(-14f, FloorTop + 0.75f));
-        PlaceDummy("Dummy Nox", Shape.Shadow, new Vector2(-13f, FloorTop + 0.75f));
-    }
-
-    private static void PlaceDummy(string name, Shape shape, Vector2 position)
-    {
-        GameObject dummy = PlacePrefab("PlayerDummy", position, name);
-        SetEnum(dummy.GetComponent<PlayerDummy>(), "startShape", (int)shape);
+        // #11: de echte spelers. De PlayerDummy-prefab blijft bestaan voor losse tests.
+        PlacePrefab("Lumo", new Vector2(-14f, FloorTop + 1f));
+        PlacePrefab("Nox", new Vector2(-13f, FloorTop + 1f));
     }
 
     // ---------- Prefabs ----------
@@ -630,6 +626,34 @@ public static class LumoTools
         return card;
     }
 
+    private static void BuildPlayer(string name, string sheet, Player.Controls controls, Shape startShape,
+        float jumpForce, bool canPushBoxes)
+    {
+        var player = new GameObject(name);
+        player.tag = "Player";
+
+        SpriteRenderer renderer = player.AddComponent<SpriteRenderer>();
+        renderer.sprite = LoadCharacterSprite(sheet);
+        renderer.sortingOrder = 5;
+
+        var body = player.AddComponent<Rigidbody2D>();
+        body.gravityScale = 3f;
+
+        // Collider iets kleiner dan het plaatje, zodat je niet blijft haken aan randen.
+        var collider = player.AddComponent<BoxCollider2D>();
+        Bounds bounds = renderer.sprite.bounds;
+        collider.size = new Vector2(bounds.size.x * 0.7f, bounds.size.y * 0.9f);
+        collider.offset = new Vector2(bounds.center.x, bounds.min.y + collider.size.y / 2f);
+
+        Player script = player.AddComponent<Player>();
+        SetEnum(script, "controls", (int)controls);
+        SetEnum(script, "startShape", (int)startShape);
+        SetFloat(script, "jumpForce", jumpForce);
+        SetBool(script, "canPushBoxes", canPushBoxes);
+
+        SavePrefab(player, name);
+    }
+
     // ---------- Sandbox ----------
 
     private static void CreateCamera()
@@ -774,6 +798,37 @@ public static class LumoTools
         var serialized = new SerializedObject(target);
         serialized.FindProperty(field).enumValueIndex = value;
         serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetFloat(Object target, string field, float value)
+    {
+        var serialized = new SerializedObject(target);
+        serialized.FindProperty(field).floatValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetBool(Object target, string field, bool value)
+    {
+        var serialized = new SerializedObject(target);
+        serialized.FindProperty(field).boolValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
+    /// Eerste plaatje (_0) van een karakter-sheet in Assets/Sprites/Characters/.
+    /// </summary>
+    public static Sprite LoadCharacterSprite(string sheet)
+    {
+        foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/Characters/" + sheet + ".png"))
+        {
+            if (asset is Sprite sprite && sprite.name == sheet + "_0")
+            {
+                return sprite;
+            }
+        }
+
+        Debug.LogError("Lumo & Nox: karakter-sheet niet gevonden: " + sheet);
+        return null;
     }
 
     private static Transform CreateMarker(GameObject parent, string name, Vector2 position)

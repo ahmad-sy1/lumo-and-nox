@@ -4,7 +4,7 @@
 
 ![Klassendiagram](diagrams/class-diagram.svg)
 
-We maken één klasse `Player`. Lumo en Nox zijn twee spelers met andere instellingen: Lumo heeft een hogere `jumpForce` en Nox heeft `canPushBoxes` aan. Zo hoeven we niets dubbel te schrijven.
+We maken één klasse `Player`. Lumo en Nox zijn twee spelers met andere instellingen: Lumo heeft een hogere `jumpForce` en Nox heeft `canPushBoxes` aan. Zo hoeven we niets dubbel te schrijven. Met `controls` kies je de toetsen: Lumo gebruikt `Wasd`, Nox gebruikt `Arrows`.
 
 Een speler gebruikt een `Lever` met `Interact()`. De `Lever` krijgt dan een `Use()`-aanroep.
 
