@@ -32,7 +32,10 @@ Het volledige ontwerp staat in `docs/design.md`. Lees dat eerst als je iets over
 
 ## Git
 
+- Wij werken met GitHub issues en milestones (Sprint 1, 2 en 3). Elke taak is een issue.
 - Werk per taak op een eigen branch (bijvoorbeeld `feature/swap-manager`).
+- Zet in de PR `Closes #nummer`, zodat het issue sluit bij het mergen.
+- Zet de PR in dezelfde milestone als het issue.
 - Commit-berichten in het Engels, kort.
 - Push niet zonder het eerst te vragen.
 - Zet Claude nergens neer: geen `Co-Authored-By`, geen "Generated with Claude Code" in commits, PR's of issues.
