@@ -27,7 +27,9 @@ public class Player : MonoBehaviour, IPlayer
     private BoxCollider2D box;
     private SpriteRenderer spriteRenderer;
     private ContactFilter2D groundFilter;
+    private ContactFilter2D interactFilter;
     private readonly Collider2D[] groundHits = new Collider2D[4];
+    private readonly Collider2D[] interactHits = new Collider2D[8];
     private Shape shape;
     private bool isDead;
     private bool isGrounded;
@@ -54,6 +56,10 @@ public class Player : MonoBehaviour, IPlayer
         groundFilter = new ContactFilter2D();
         groundFilter.NoFilter();
         groundFilter.useTriggers = false;
+
+        // Een hendel heeft een trigger als bereik, dus hier tellen triggers wel mee.
+        interactFilter = new ContactFilter2D();
+        interactFilter.NoFilter();
     }
 
     private void Update()
@@ -68,11 +74,18 @@ public class Player : MonoBehaviour, IPlayer
         bool right = controls == Controls.Wasd ? keyboard.dKey.isPressed : keyboard.rightArrowKey.isPressed;
         bool jump = controls == Controls.Wasd ? keyboard.wKey.wasPressedThisFrame : keyboard.upArrowKey.wasPressedThisFrame;
 
+        bool interact = controls == Controls.Wasd ? keyboard.eKey.wasPressedThisFrame : keyboard.rightShiftKey.wasPressedThisFrame;
+
         Move((right ? 1f : 0f) - (left ? 1f : 0f));
 
         if (jump)
         {
             Jump();
+        }
+
+        if (interact)
+        {
+            Interact();
         }
     }
 
@@ -109,6 +122,28 @@ public class Player : MonoBehaviour, IPlayer
         }
 
         body.linearVelocity = new Vector2(body.linearVelocity.x, jumpForce);
+    }
+
+    /// <summary>
+    /// Gebruikt de hendel waar we in staan (binnen het bereik van de trigger).
+    /// </summary>
+    public void Interact()
+    {
+        if (isDead)
+        {
+            return;
+        }
+
+        int count = box.Overlap(interactFilter, interactHits);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (interactHits[i].TryGetComponent(out Lever lever))
+            {
+                lever.Use();
+                return;
+            }
+        }
     }
 
     /// <summary>
