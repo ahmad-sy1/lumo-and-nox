@@ -83,11 +83,16 @@ class MovingPlatform <<MonoBehaviour>> {
 
 class Lever <<MonoBehaviour>> {
   - isOn : bool
+  - onSprite : Sprite
+  - offSprite : Sprite
   + Use() : void
 }
 
 class PressButton <<MonoBehaviour>> {
   - isPressed : bool
+  - objectsOnButton : int
+  - upSprite : Sprite
+  - downSprite : Sprite
   # OnTriggerEnter2D(other : Collider2D) : void
   # OnTriggerExit2D(other : Collider2D) : void
 }
