@@ -52,7 +52,8 @@ In Progress → In Review → Done. Elke taak is een issue.
    - beschrijving in het Nederlands: wat er gebouwd is, hoe je het test, en `Closes #<nr>`
    - zelfde milestone als het issue, reviewer = de ander (Osama of Ahmad)
    - bouwt de PR voort op een andere open PR: zet erin "Eerst #<andere PR> mergen".
-5. **Op review zetten:** voeg de PR toe aan het board en zet het issue op **In Review**.
+5. **Op review zetten:** zet het issue op **In Review**. Voeg de PR zelf NIET toe aan het board;
+   door `Closes #<nr>` is hij al gekoppeld en zie je hem als link in de issue-kaart.
 6. **Nooit zelf mergen.** De ander reviewt en merget. Door `Closes #<nr>` sluit het issue
    en gaat de kaart naar **Done**.
 
