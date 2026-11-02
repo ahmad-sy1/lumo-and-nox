@@ -152,7 +152,7 @@ class Crystal <<MonoBehaviour>> {
 }
 
 class ExitPortal <<MonoBehaviour>> {
-  - playersInside : int
+  - playersInside : HashSet<GameObject>
   # OnTriggerEnter2D(other : Collider2D) : void
   # OnTriggerExit2D(other : Collider2D) : void
 }
@@ -163,8 +163,10 @@ class LevelManager <<MonoBehaviour>> {
   - elapsedTime : float
   - crystals : int
   - isRespawning : bool
+  - isFinished : bool
   + Deaths : int
   + ElapsedTime : float
+  + Crystals : int
   + OnPlayerDied() : void
   + SetCheckpoint(checkpoint : Checkpoint) : void
   + AddCrystal() : void

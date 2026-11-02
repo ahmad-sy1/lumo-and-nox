@@ -37,6 +37,10 @@ public class SwapManager : MonoBehaviour, ISwapTimer
 
 Als het level klaar is, zet de `LevelManager` `Time.timeScale` op 0. Gebruik in de `SwapManager` dus `Time.deltaTime`, dan stopt de timer vanzelf.
 
+## HUD
+
+De HUD (#14) kan de stand lezen uit de `LevelManager`: `Crystals` (0–3), `Deaths` en `ElapsedTime` (seconden).
+
 ## Interfaces
 
 ```csharp
