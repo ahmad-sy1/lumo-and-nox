@@ -16,7 +16,7 @@ Zones en de `LevelManager` kennen de `Player` alleen via de interface `IPlayer` 
 
 De `LevelManager` is het centrum van een level. `Player`, `Checkpoint`, `Crystal` en `ExitPortal` roepen hem aan als er iets gebeurt. Hij onthoudt het `currentCheckpoint`, telt doden en kristallen en toont het `WinScreen`. De `SwapManager` kent beide spelers en wisselt hun vorm. De `GameManager` laadt met `LoadProgress()` de `SaveData` (zie het data-model).
 
-`LightPlatform` en `ShadowWall` zijn de puzzel-onderdelen die reageren op de krachten Gloed en Schaduwstap. `HUD`, `MainMenu`, `PauseMenu` en `WinScreen` zijn de schermen. `MainMenu` start het spel of een level via de `GameManager`. We houden het klein, want het is een MVP van 3 weken.
+`LightPlatform` en `ShadowWall` zijn de puzzel-onderdelen die reageren op de krachten Gloed en Schaduwstap. `ShadowWall.SetPassable()` krijgt de collider van de speler mee, zodat de muur alleen open is voor de speler met Schaduwstap. Een `PushBox` staat vast in de breedte; alleen `Push()` (door Nox) laat hem schuiven. Staat een kist in de straal van een `Lamp`, dan stopt de straal bij de kist en is het daaronder schaduw. Een kist op een `PressButton` telt mee als iemand die erop staat. `HUD`, `MainMenu`, `PauseMenu` en `WinScreen` zijn de schermen. `MainMenu` start het spel of een level via de `GameManager`. We houden het klein, want het is een MVP van 3 weken.
 
 `Palette` bevat de kleuren van Lumo en Nox als vaste waarden, dezelfde als in `tools/generate_tiles.py`. Zo gebruiken scripts (bijvoorbeeld voor licht of de HUD) precies dezelfde kleuren als de graphics.
 

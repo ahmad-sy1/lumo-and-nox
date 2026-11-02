@@ -32,6 +32,9 @@ public static class LumoTools
         BuildZone<HazardZone>("HazardZone", "stekels", 2);
         BuildZone<DarkZone>("DarkZone", "donkere_poel", 2);
         BuildPlayerDummy();
+        BuildLightPlatform();
+        BuildShadowWall();
+        BuildPushBox();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -68,21 +71,28 @@ public static class LumoTools
     private static void PlaceTestSetup()
     {
         // #16 en #17: hendel -> deur, drukknop -> deur.
-        GameObject leverDoor = PlacePrefab("Door", new Vector2(-12f, FloorTop + 1f), "Door (hendel)");
-        GameObject lever = PlacePrefab("Lever", new Vector2(-10.5f, FloorTop + 0.5f));
+        GameObject leverDoor = PlacePrefab("Door", new Vector2(-11.5f, FloorTop + 1f), "Door (hendel)");
+        GameObject lever = PlacePrefab("Lever", new Vector2(-10f, FloorTop + 0.5f));
         SetField(lever.GetComponent<Lever>(), "target", leverDoor.GetComponent<Door>());
 
-        GameObject buttonDoor = PlacePrefab("Door", new Vector2(-7f, FloorTop + 1f), "Door (drukknop)");
-        GameObject button = PlacePrefab("PressButton", new Vector2(-8.5f, FloorTop + 0.5f));
+        GameObject buttonDoor = PlacePrefab("Door", new Vector2(-8f, FloorTop + 1f), "Door (drukknop)");
+        GameObject button = PlacePrefab("PressButton", new Vector2(-6.5f, FloorTop + 0.5f));
         SetField(button.GetComponent<PressButton>(), "target", buttonDoor.GetComponent<Door>());
 
-        // #16: lamp en bewegend platform. #18: de straal van de lamp is een LightZone.
-        PlacePrefab("Lamp", new Vector2(-4f, FloorTop + 6.5f));
+        // #19: kist tussen drukknop en lamp. Naar links = op de knop, naar rechts = onder de straal.
+        PlacePrefab("PushBox", new Vector2(-5f, FloorTop + 0.5f));
+
+        // #16 en #18: lamp met LightZone als straal, en bewegend platform.
+        PlacePrefab("Lamp", new Vector2(-3f, FloorTop + 6.5f));
         PlacePrefab("MovingPlatform", new Vector2(8f, FloorTop + 5f));
 
-        // #18: zones en twee test-spelers.
+        // #18: zones. #19: lichtplatform boven de poel en een schaduwmuur.
         PlacePrefab("DarkZone", new Vector2(2f, FloorTop + 0.5f));
+        PlacePrefab("LightPlatform", new Vector2(2f, FloorTop + 2.5f));
         PlacePrefab("HazardZone", new Vector2(5f, FloorTop + 0.5f));
+        PlacePrefab("ShadowWall", new Vector2(11f, FloorTop + 1.5f));
+
+        // #18: twee test-spelers.
         PlaceDummy("Dummy Lumo", Shape.Light, new Vector2(-14f, FloorTop + 0.75f));
         PlaceDummy("Dummy Nox", Shape.Shadow, new Vector2(-13f, FloorTop + 0.75f));
     }
@@ -195,23 +205,67 @@ public static class LumoTools
 
     private static void BuildZone<T>(string name, string tile, int width) where T : Zone
     {
-        var zone = new GameObject(name);
-        for (int i = 0; i < width; i++)
+        GameObject zone = CreateTileBlock(name, tile, width);
+        zone.GetComponent<BoxCollider2D>().isTrigger = true;
+        zone.AddComponent<T>();
+        SavePrefab(zone, name);
+    }
+
+    private static void BuildLightPlatform()
+    {
+        GameObject platform = CreateTileBlock("LightPlatform", "lichtplatform_verborgen", 2);
+        Bounds bounds = LoadTile("lichtplatform_zichtbaar").bounds;
+        var collider = platform.GetComponent<BoxCollider2D>();
+        collider.size = new Vector2(2f, bounds.size.y);
+        collider.offset = new Vector2(0f, bounds.center.y);
+
+        LightPlatform script = platform.AddComponent<LightPlatform>();
+        SetField(script, "revealedSprite", LoadTile("lichtplatform_zichtbaar"));
+        SetField(script, "hiddenSprite", LoadTile("lichtplatform_verborgen"));
+
+        SavePrefab(platform, "LightPlatform");
+    }
+
+    private static void BuildShadowWall()
+    {
+        GameObject wall = CreateTileBlock("ShadowWall", "schaduwmuur", 1, 3);
+        wall.AddComponent<ShadowWall>();
+        SavePrefab(wall, "ShadowWall");
+    }
+
+    private static void BuildPushBox()
+    {
+        var box = new GameObject("PushBox");
+        AddSprite(box, "kist").sortingOrder = 2;
+        box.AddComponent<PushBox>();
+        box.GetComponent<Rigidbody2D>().constraints =
+            RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
+        SavePrefab(box, "PushBox");
+    }
+
+    /// <summary>
+    /// Blok van width x height tegels als children, met één BoxCollider2D op de root.
+    /// </summary>
+    private static GameObject CreateTileBlock(string name, string tile, int width, int height = 1)
+    {
+        var root = new GameObject(name);
+        for (int x = 0; x < width; x++)
         {
-            var part = new GameObject("Tile" + i);
-            part.transform.SetParent(zone.transform, false);
-            part.transform.localPosition = new Vector3(i - (width - 1) / 2f, 0f, 0f);
-            AddSprite(part, tile);
+            for (int y = 0; y < height; y++)
+            {
+                var part = new GameObject($"Tile{x}_{y}");
+                part.transform.SetParent(root.transform, false);
+                part.transform.localPosition = new Vector3(x - (width - 1) / 2f, y - (height - 1) / 2f, 0f);
+                AddSprite(part, tile);
+            }
         }
 
-        zone.AddComponent<T>();
+        // Eén rij: collider zo hoog als het plaatje. Meer rijen: hele tegels.
         Bounds bounds = LoadTile(tile).bounds;
-        var collider = zone.GetComponent<BoxCollider2D>();
-        collider.size = new Vector2(width, bounds.size.y);
-        collider.offset = new Vector2(0f, bounds.center.y);
-        collider.isTrigger = true;
-
-        SavePrefab(zone, name);
+        var collider = root.AddComponent<BoxCollider2D>();
+        collider.size = height == 1 ? new Vector2(width, bounds.size.y) : new Vector2(width, height);
+        collider.offset = height == 1 ? new Vector2(0f, bounds.center.y) : Vector2.zero;
+        return root;
     }
 
     private static void BuildPlayerDummy()
