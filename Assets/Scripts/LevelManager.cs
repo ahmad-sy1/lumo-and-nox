@@ -10,17 +10,21 @@ public class LevelManager : MonoBehaviour
 {
     private const float RespawnDelay = 0.5f;
     private const float PlayerSpacing = 0.6f;
+    private const int MaxCrystals = 3;
 
     [SerializeField] private Transform startPoint;
 
     private int deaths;
     private float elapsedTime;
+    private int crystals;
+    private bool isFinished;
     private Checkpoint currentCheckpoint;
     private bool isRespawning;
     private ISwapTimer swapTimer;
 
     public int Deaths => deaths;
     public float ElapsedTime => elapsedTime;
+    public int Crystals => crystals;
 
     private void Awake()
     {
@@ -29,13 +33,16 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        elapsedTime += Time.deltaTime;
+        if (!isFinished)
+        {
+            elapsedTime += Time.deltaTime;
+        }
     }
 
     public void OnPlayerDied()
     {
         // Beide spelers of meerdere zones tegelijk: maar één keer tellen.
-        if (isRespawning)
+        if (isRespawning || isFinished)
         {
             return;
         }
@@ -50,6 +57,27 @@ public class LevelManager : MonoBehaviour
         currentCheckpoint = checkpoint;
         Debug.Log($"LevelManager: nieuw checkpoint '{checkpoint.name}'.", this);
         ResetSwapTimer();
+    }
+
+    public void AddCrystal()
+    {
+        crystals = Mathf.Min(crystals + 1, MaxCrystals);
+        Debug.Log($"LevelManager: kristallen {crystals}/{MaxCrystals}.", this);
+    }
+
+    public void FinishLevel()
+    {
+        if (isFinished)
+        {
+            return;
+        }
+
+        // Alles stilzetten: besturing, wissel-timer en tijd. Het winscherm zet timeScale weer terug.
+        isFinished = true;
+        Time.timeScale = 0f;
+        Debug.Log($"LevelManager: level klaar! Tijd {elapsedTime:0.0} s, kristallen {crystals}/{MaxCrystals}, deaths {deaths}.", this);
+
+        // Het winscherm (issue #25) roept hier straks WinScreen.Show(elapsedTime, crystals, deaths) aan.
     }
 
     private IEnumerator RespawnAfterDelay()
@@ -86,6 +114,12 @@ public class LevelManager : MonoBehaviour
         {
             Debug.Log("LevelManager: wissel-timer reset (nog geen SwapManager in deze scene).", this);
         }
+    }
+
+    [ContextMenu("Test: level klaar")]
+    private void TestFinishLevel()
+    {
+        FinishLevel();
     }
 
     [ContextMenu("Test: speler dood")]

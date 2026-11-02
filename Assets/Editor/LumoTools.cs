@@ -37,6 +37,8 @@ public static class LumoTools
         BuildPushBox();
         BuildCheckpoint();
         BuildLevelManager();
+        BuildCrystal();
+        BuildExitPortal();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -100,6 +102,13 @@ public static class LumoTools
         GameObject levelManager = PlacePrefab("LevelManager", Vector2.zero);
         SetField(levelManager.GetComponent<LevelManager>(), "startPoint", start.transform);
         PlacePrefab("Checkpoint", new Vector2(-1f, FloorTop + 1f));
+
+        // #21: drie kristallen (boven de lantaarn, boven het lichtplatform, boven het bewegende platform)
+        // en het uitgangsportaal rechts.
+        PlacePrefab("Crystal", new Vector2(-1f, FloorTop + 3.5f), "Crystal 1");
+        PlacePrefab("Crystal", new Vector2(2f, FloorTop + 4f), "Crystal 2");
+        PlacePrefab("Crystal", new Vector2(8f, FloorTop + 7f), "Crystal 3");
+        PlacePrefab("ExitPortal", new Vector2(13.5f, FloorTop + 1f));
 
         // #18: twee test-spelers.
         PlaceDummy("Dummy Lumo", Shape.Light, new Vector2(-14f, FloorTop + 0.75f));
@@ -259,6 +268,23 @@ public static class LumoTools
         Checkpoint script = checkpoint.AddComponent<Checkpoint>();
         SetField(script, "litSprite", LoadTile("lantaarn_aan"));
         SavePrefab(checkpoint, "Checkpoint");
+    }
+
+    private static void BuildCrystal()
+    {
+        var crystal = new GameObject("Crystal");
+        AddSprite(crystal, "kristal").sortingOrder = 3;
+        crystal.AddComponent<Crystal>();
+        SavePrefab(crystal, "Crystal");
+    }
+
+    private static void BuildExitPortal()
+    {
+        var portal = new GameObject("ExitPortal");
+        SpriteRenderer renderer = AddSprite(portal, "portaal");
+        renderer.color = new Color(0.6f, 0.6f, 0.6f);
+        portal.AddComponent<ExitPortal>();
+        SavePrefab(portal, "ExitPortal");
     }
 
     private static void BuildLevelManager()
