@@ -14,6 +14,8 @@ public static class LumoTools
     private const string TilesFolder = "Assets/Art/Tiles/";
     private const string PrefabsFolder = "Assets/Prefabs/";
     private const string SandboxPath = "Assets/Scenes/Sandbox.unity";
+    private const string MainMenuPath = "Assets/Scenes/MainMenu.unity";
+    private const string MenuArtPath = "Assets/Art/Menu/scene_preview.png";
     private const string SquareSpritePath =
         "Packages/com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Square.png";
 
@@ -46,6 +48,37 @@ public static class LumoTools
 
         AssetDatabase.SaveAssets();
         Debug.Log("Lumo & Nox: prefabs gebouwd in " + PrefabsFolder);
+    }
+
+    /// <summary>
+    /// Alles in één keer: prefabs, Sandbox en hoofdmenu.
+    /// </summary>
+    [MenuItem("Lumo & Nox/Build all")]
+    public static void BuildAll()
+    {
+        BuildSandbox();
+        BuildMainMenuScene();
+    }
+
+    /// <summary>
+    /// Bouwt MainMenu.unity: startscherm, hoofdmenu en level select (wireframes 01-03).
+    /// </summary>
+    [MenuItem("Lumo & Nox/Build MainMenu scene")]
+    public static void BuildMainMenuScene()
+    {
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        CreateCamera();
+        UiBuilder.CreateEventSystem();
+        PlacePrefab("GameManager", Vector2.zero);
+        BuildMainMenuCanvas();
+
+        EditorSceneManager.SaveScene(scene, MainMenuPath);
+        Debug.Log("Lumo & Nox: hoofdmenu opgeslagen in " + MainMenuPath);
     }
 
     /// <summary>
@@ -311,7 +344,7 @@ public static class LumoTools
         GameObject panel = UiBuilder.CreateFullPanel(canvas.transform, "Panel", new Color(Palette.nachtS.r, Palette.nachtS.g, Palette.nachtS.b, 0.92f));
         Transform p = panel.transform;
 
-        UiBuilder.CreateText(p, "Title", "Level voltooid!", UiBuilder.TitleText, Palette.goud, new Vector2(0f, 360f), new Vector2(1600f, 140f), bold: true);
+        UiBuilder.CreateTitle(p, "Title", "Level voltooid!", 88, Palette.goud, new Vector2(0f, 360f), new Vector2(1600f, 140f));
         Text levelText = UiBuilder.CreateText(p, "Level", "Level 1", UiBuilder.NormalText, Palette.steen, new Vector2(0f, 250f), new Vector2(1200f, 60f));
 
         Text timeText = CreateStatCard(p, "Tijd", -560f);
@@ -397,6 +430,96 @@ public static class LumoTools
         dummy.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
 
         SavePrefab(dummy, "PlayerDummy");
+    }
+
+    // ---------- Hoofdmenu ----------
+
+    private static void BuildMainMenuCanvas()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("MainMenu", 0);
+        MainMenu menu = canvas.gameObject.AddComponent<MainMenu>();
+        Transform root = canvas.transform;
+
+        // Achtergrond: licht links, schaduw rechts.
+        UiBuilder.CreateFullPanel(root, "Achtergrond", Palette.nachtS);
+        var lightHalf = (RectTransform)UiBuilder.CreateFullPanel(root, "Licht", Palette.nachtL).transform;
+        lightHalf.anchorMax = new Vector2(0.5f, 1f);
+
+        // 01 Startscherm: het hele scherm is één knop (klik of Enter).
+        GameObject start = UiBuilder.CreateFullPanel(root, "Startscherm", Color.clear);
+        Button startButton = start.AddComponent<Button>();
+        startButton.transition = Selectable.Transition.None;
+        UnityEditor.Events.UnityEventTools.AddPersistentListener(startButton.onClick, menu.ShowMain);
+        Transform s = start.transform;
+        CreateCircle(s, "Lumo", "Lumo (licht)", Palette.goud, -130f);
+        CreateCircle(s, "Nox", "Nox (schaduw)", Palette.doorn, 130f);
+        UiBuilder.CreateTitle(s, "Title", "LUMO & NOX", 128, Palette.goud, new Vector2(0f, 0f), new Vector2(1800f, 180f));
+        UiBuilder.CreateText(s, "Subtitle", "co-op puzzel-platformer voor twee spelers", UiBuilder.SmallText, Palette.steen, new Vector2(0f, -110f), new Vector2(1600f, 50f));
+        Text pressEnter = UiBuilder.CreateText(s, "Druk op Enter", "Druk op Enter om te beginnen", UiBuilder.NormalText, Palette.steenH, new Vector2(0f, -300f), new Vector2(1600f, 60f));
+
+        // 02 Hoofdmenu.
+        GameObject main = UiBuilder.CreateFullPanel(root, "Hoofdmenu", Color.clear);
+        Transform m = main.transform;
+        UiBuilder.CreateTitle(m, "Title", "LUMO & NOX", 72, Palette.goud, new Vector2(-520f, 360f), new Vector2(900f, 140f));
+        Vector2 buttonSize = new Vector2(640f, 100f);
+        Button play = UiBuilder.CreateButton(m, "Spelen", "Spelen", new Vector2(-520f, 170f), buttonSize, menu.Play);
+        UiBuilder.CreateButton(m, "Level select", "Level select", new Vector2(-520f, 50f), buttonSize, menu.ShowLevelSelect);
+        UiBuilder.CreateButton(m, "Opties", "Opties", new Vector2(-520f, -70f), buttonSize);
+        UiBuilder.CreateButton(m, "Afsluiten", "Afsluiten", new Vector2(-520f, -190f), buttonSize, menu.Quit);
+        CreateMenuArt(m, new Vector2(440f, 20f), new Vector2(880f, 411f));
+        UiBuilder.CreateText(m, "Hint", "Pijltjes: kiezen   Enter: bevestigen   muis werkt ook", 24, Palette.steenS, new Vector2(-520f, -420f), new Vector2(1000f, 40f));
+
+        // 03 Level select.
+        GameObject select = UiBuilder.CreateFullPanel(root, "Level select", Color.clear);
+        Transform l = select.transform;
+        UiBuilder.CreateButton(l, "Terug", "< Terug", new Vector2(-760f, 420f), new Vector2(280f, 90f), menu.ShowMain);
+        UiBuilder.CreateTitle(l, "Title", "Kies een level", 56, Palette.goud, new Vector2(60f, 420f), new Vector2(1000f, 120f));
+        var levelButtons = new Button[2];
+        var levelInfos = new Text[2];
+        string[] subtitles = { "Tutorial - wissel elke 30 s", "Samenwerken - wissel elke 20 s" };
+        for (int i = 0; i < levelButtons.Length; i++)
+        {
+            levelButtons[i] = CreateLevelCard(l, i, subtitles[i], i == 0 ? -450f : 450f, out levelInfos[i]);
+            UiBuilder.AddClick(levelButtons[i], menu.SelectLevel, i);
+        }
+        UiBuilder.CreateText(l, "Hint", "Klik of Enter op een kaart   Esc of Terug: hoofdmenu", 24, Palette.steenS, new Vector2(0f, -420f), new Vector2(1600f, 40f));
+
+        SetField(menu, "startPanel", start);
+        SetField(menu, "mainPanel", main);
+        SetField(menu, "levelSelectPanel", select);
+        SetField(menu, "pressEnterText", pressEnter);
+        SetField(menu, "playButton", play);
+        SetArray(menu, "levelButtons", levelButtons);
+        SetArray(menu, "levelInfoTexts", levelInfos);
+    }
+
+    private static void CreateCircle(Transform parent, string name, string label, Color color, float x)
+    {
+        GameObject circle = UiBuilder.CreateImage(parent, name, color, new Vector2(x, 260f), new Vector2(150f, 150f));
+        circle.GetComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+        UiBuilder.CreateText(parent, name + " label", label, 24, Palette.steen, new Vector2(x, 160f), new Vector2(260f, 40f));
+    }
+
+    private static void CreateMenuArt(Transform parent, Vector2 position, Vector2 size)
+    {
+        GameObject art = UiBuilder.CreateImage(parent, "Achtergrondbeeld", Color.white, position, size);
+        Image image = art.GetComponent<Image>();
+        image.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(MenuArtPath);
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+    }
+
+    private static Button CreateLevelCard(Transform parent, int index, string subtitle, float x, out Text info)
+    {
+        Button card = UiBuilder.CreateButton(parent, "Level " + (index + 1), "", new Vector2(x, -30f), new Vector2(840f, 640f));
+        Object.DestroyImmediate(card.transform.Find("Label").gameObject);
+        Transform c = card.transform;
+
+        CreateMenuArt(c, new Vector2(0f, 130f), new Vector2(780f, 364f));
+        UiBuilder.CreateText(c, "Title", GameManager.LevelNames[index].Replace('–', '-'), UiBuilder.NormalText, Palette.nachtS, new Vector2(0f, -110f), new Vector2(800f, 60f), bold: true);
+        UiBuilder.CreateText(c, "Subtitle", subtitle, UiBuilder.SmallText, Palette.nachtS, new Vector2(0f, -170f), new Vector2(800f, 50f));
+        info = UiBuilder.CreateText(c, "Info", "", 24, Palette.nachtS, new Vector2(0f, -240f), new Vector2(800f, 60f));
+        return card;
     }
 
     // ---------- Sandbox ----------

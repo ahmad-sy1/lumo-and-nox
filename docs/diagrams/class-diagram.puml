@@ -193,6 +193,14 @@ class GameManager <<MonoBehaviour>> {
 }
 
 class MainMenu <<MonoBehaviour>> {
+  - startPanel : GameObject
+  - mainPanel : GameObject
+  - levelSelectPanel : GameObject
+  - levelButtons : Button[]
+  - levelInfoTexts : Text[]
+  + ShowStart() : void
+  + ShowMain() : void
+  + ShowLevelSelect() : void
   + Play() : void
   + SelectLevel(index : int) : void
   + Quit() : void
