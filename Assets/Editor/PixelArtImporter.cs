@@ -16,6 +16,15 @@ public class PixelArtImporter : AssetPostprocessor
         return 1;
     }
 
+    // Pixel-fonts scherp houden.
+    private void OnPreprocessAsset()
+    {
+        if (assetPath.StartsWith("Assets/Art/") && assetImporter is TrueTypeFontImporter fontImporter)
+        {
+            fontImporter.fontRenderingMode = FontRenderingMode.HintedRaster;
+        }
+    }
+
     private void OnPreprocessTexture()
     {
         if (!assetPath.StartsWith("Assets/Art/") && !assetPath.StartsWith("Assets/Sprites/"))

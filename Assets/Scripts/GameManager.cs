@@ -120,6 +120,15 @@ public class GameManager : MonoBehaviour
         // Muziek- en effectvolume gebruiken we zodra er geluid is.
     }
 
+    /// <summary>
+    /// Tijd als mm:ss.
+    /// </summary>
+    public static string FormatTime(float seconds)
+    {
+        int total = Mathf.FloorToInt(seconds);
+        return $"{total / 60:00}:{total % 60:00}";
+    }
+
     public bool IsUnlocked(int levelIndex)
     {
         return levelIndex == 0 || data.levels[levelIndex - 1].completed;
