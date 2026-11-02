@@ -19,6 +19,7 @@ public static class UiBuilder
 
     private const string FontRegular = "Assets/Art/Fonts/Silkscreen-Regular.ttf";
     private const string FontBold = "Assets/Art/Fonts/Silkscreen-Bold.ttf";
+    private const string FontTitle = "Assets/Art/Fonts/PressStart2P-Regular.ttf";
 
     public static Canvas CreateCanvas(string name, int sortingOrder)
     {
@@ -76,6 +77,17 @@ public static class UiBuilder
         label.verticalOverflow = VerticalWrapMode.Overflow;
         label.raycastTarget = false;
         return label;
+    }
+
+    /// <summary>
+    /// Titel in Press Start 2P (Silkscreen tekent "&amp;" bijna als een euroteken).
+    /// </summary>
+    public static Text CreateTitle(Transform parent, string name, string text, int fontSize, Color color,
+        Vector2 position, Vector2 size)
+    {
+        Text title = CreateText(parent, name, text, fontSize, color, position, size);
+        title.font = AssetDatabase.LoadAssetAtPath<Font>(FontTitle);
+        return title;
     }
 
     /// <summary>
