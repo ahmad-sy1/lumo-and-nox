@@ -8,7 +8,7 @@ Het volledige ontwerp staat in `docs/design.md`. Lees dat eerst als je iets over
 
 - Unity (Universal 2D), versie: zie `ProjectSettings/ProjectVersion.txt`
 - C# scripts in `Assets/Scripts/`
-- Assets van Kenney.nl
+- Graphics zelf gemaakt (`Assets/Art/`, generator in `tools/generate_tiles.py`), geluid van Kenney.nl
 
 ## Structuur
 
