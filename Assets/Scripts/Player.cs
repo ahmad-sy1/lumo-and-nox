@@ -51,7 +51,8 @@ public class Player : MonoBehaviour, IPlayer
         // Zonder wrijving blijf je niet aan een muur plakken als je ertegenaan springt.
         box.sharedMaterial = new PhysicsMaterial2D { friction = 0f, bounciness = 0f };
 
-        groundFilter = ContactFilter2D.NoFilter();
+        groundFilter = new ContactFilter2D();
+        groundFilter.NoFilter();
         groundFilter.useTriggers = false;
     }
 
