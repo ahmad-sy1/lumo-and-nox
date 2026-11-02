@@ -8,18 +8,28 @@ enum Shape {
   Shadow
 }
 
+enum Controls {
+  Wasd
+  Arrows
+}
+
 class Player <<MonoBehaviour>> {
   ' Lumo en Nox zijn twee instanties met andere instellingen
+  - controls : Controls
+  - startShape : Shape
   - jumpForce : float
   - canPushBoxes : bool
   - moveSpeed : float
   - isGrounded : bool
+  - isDead : bool
+  + CurrentShape : Shape
   + Move(direction : float) : void
   + Jump() : void
   + UseAbility() : void
   + Interact() : void
   + SetShape(newShape : Shape) : void
   + Die() : void
+  + Respawn(position : Vector2) : void
 }
 
 class SwapManager <<MonoBehaviour>> {
@@ -245,6 +255,7 @@ Activatable <|-- MovingPlatform
 
 ' Player
 Player --> "1" Shape : shape
+Player --> "1" Controls : controls
 Player --> "1" LevelManager : meldt dood
 Player ..> "0..*" PushBox : duwt
 Player ..> "0..*" LightPlatform : Gloed
