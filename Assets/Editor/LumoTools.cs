@@ -27,12 +27,17 @@ public static class LumoTools
         BuildDoor();
         BuildLamp();
         BuildMovingPlatform();
+        BuildLever();
+        BuildPressButton();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
         Debug.Log("Lumo & Nox: prefabs gebouwd in " + PrefabsFolder);
     }
 
+    /// <summary>
+    /// Bouwt eerst alle prefabs opnieuw en daarna de Sandbox.
+    /// </summary>
     [MenuItem("Lumo & Nox/Build Sandbox scene")]
     public static void BuildSandbox()
     {
@@ -41,20 +46,36 @@ public static class LumoTools
             return;
         }
 
+        BuildPrefabs();
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
         CreateCamera();
         CreateGlobalLight();
         CreateBackground();
         CreateFloor();
-
-        // Eén van elke prefab, naast elkaar op de vloer. Nieuwe prefabs hier toevoegen.
-        PlacePrefab("Door", new Vector2(-9f, FloorTop + 1f));
-        PlacePrefab("Lamp", new Vector2(-3f, FloorTop + 6.5f));
-        PlacePrefab("MovingPlatform", new Vector2(6f, FloorTop + 3f));
+        PlaceTestSetup();
 
         EditorSceneManager.SaveScene(scene, SandboxPath);
         Debug.Log("Lumo & Nox: Sandbox opgeslagen in " + SandboxPath);
+    }
+
+    /// <summary>
+    /// Eén opstelling per issue, zodat elk acceptatiecriterium te testen is. Nieuwe opstellingen hier toevoegen.
+    /// </summary>
+    private static void PlaceTestSetup()
+    {
+        // #16 en #17: hendel -> deur, drukknop -> deur.
+        GameObject leverDoor = PlacePrefab("Door", new Vector2(-12f, FloorTop + 1f), "Door (hendel)");
+        GameObject lever = PlacePrefab("Lever", new Vector2(-10.5f, FloorTop + 0.5f));
+        SetField(lever.GetComponent<Lever>(), "target", leverDoor.GetComponent<Door>());
+
+        GameObject buttonDoor = PlacePrefab("Door", new Vector2(-7f, FloorTop + 1f), "Door (drukknop)");
+        GameObject button = PlacePrefab("PressButton", new Vector2(-8.5f, FloorTop + 0.5f));
+        SetField(button.GetComponent<PressButton>(), "target", buttonDoor.GetComponent<Door>());
+
+        // #16: lamp en bewegend platform.
+        PlacePrefab("Lamp", new Vector2(-4f, FloorTop + 6.5f));
+        PlacePrefab("MovingPlatform", new Vector2(8f, FloorTop + 5f));
     }
 
     // ---------- Prefabs ----------
@@ -128,6 +149,32 @@ public static class LumoTools
         SetField(script, "pointB", pointB);
 
         SavePrefab(root, "MovingPlatform");
+    }
+
+    private static void BuildLever()
+    {
+        var lever = new GameObject("Lever");
+        AddSprite(lever, "hendel_links");
+
+        // De trigger is het bereik waarin de Player de hendel kan gebruiken.
+        Lever script = lever.AddComponent<Lever>();
+        lever.GetComponent<BoxCollider2D>().size = new Vector2(1.5f, 1f);
+        SetField(script, "onSprite", LoadTile("hendel_rechts"));
+        SetField(script, "offSprite", LoadTile("hendel_links"));
+
+        SavePrefab(lever, "Lever");
+    }
+
+    private static void BuildPressButton()
+    {
+        var button = new GameObject("PressButton");
+        AddSprite(button, "drukknop_omhoog");
+
+        PressButton script = button.AddComponent<PressButton>();
+        SetField(script, "upSprite", LoadTile("drukknop_omhoog"));
+        SetField(script, "downSprite", LoadTile("drukknop_ingedrukt"));
+
+        SavePrefab(button, "PressButton");
     }
 
     // ---------- Sandbox ----------
@@ -205,17 +252,16 @@ public static class LumoTools
         AddSprite(go, tile);
     }
 
-    private static void PlacePrefab(string name, Vector2 position)
+    private static GameObject PlacePrefab(string name, Vector2 position, string instanceName = null)
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabsFolder + name + ".prefab");
-        if (prefab == null)
-        {
-            BuildPrefabs();
-            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabsFolder + name + ".prefab");
-        }
-
         var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         instance.transform.position = position;
+        if (instanceName != null)
+        {
+            instance.name = instanceName;
+        }
+        return instance;
     }
 
     // ---------- Helpers ----------
