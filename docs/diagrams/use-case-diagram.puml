@@ -1,0 +1,60 @@
+@startuml use-case-diagram
+title Lumo & Nox - Use case diagram
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Speler" as Speler
+actor "Speler 1\n(Lumo)" as Lumo
+actor "Speler 2\n(Nox)" as Nox
+
+Lumo --|> Speler
+Nox --|> Speler
+
+rectangle "Lumo & Nox" {
+  package "Menu" {
+    usecase "UC1 Spel starten" as UC1
+    usecase "UC2 Level kiezen" as UC2
+    usecase "UC3 Opties aanpassen" as UC3
+    usecase "UC4 Spel afsluiten" as UC4
+    usecase "UC5 Pauzeren" as UC5
+    usecase "UC6 Level opnieuw starten" as UC6
+    usecase "UC7 Naar hoofdmenu gaan" as UC7
+  }
+
+  package "Spelen" {
+    usecase "UC8 Bewegen\n(lopen en springen)" as UC8
+    usecase "UC9 Kracht gebruiken" as UC9
+    usecase "UC10 Hendel gebruiken" as UC10
+    usecase "UC11 Op drukknop staan" as UC11
+    usecase "UC12 Kist duwen" as UC12
+    usecase "UC13 Kristal pakken" as UC13
+    usecase "UC14 Checkpoint activeren" as UC14
+    usecase "UC15 Level voltooien" as UC15
+  }
+
+  usecase "UC9a Gloed gebruiken" as Gloed
+  usecase "UC9b Schaduwstap gebruiken" as Stap
+}
+
+Speler --> UC1
+Speler --> UC2
+Speler --> UC3
+Speler --> UC4
+Speler --> UC5
+Speler --> UC8
+Speler --> UC9
+Speler --> UC10
+Speler --> UC11
+Speler --> UC13
+Speler --> UC14
+Speler --> UC15
+Nox --> UC12
+
+UC3 ..> UC5 : <<extend>>
+UC6 ..> UC5 : <<extend>>
+UC7 ..> UC5 : <<extend>>
+UC6 ..> UC15 : <<extend>>
+UC7 ..> UC15 : <<extend>>
+Gloed ..> UC9 : <<extend>>
+Stap ..> UC9 : <<extend>>
+@enduml

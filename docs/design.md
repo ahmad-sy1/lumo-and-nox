@@ -201,6 +201,6 @@ Het ontwerp bestaat uit deze onderdelen. Samen dekken ze de data, de gebruiker e
 | --- | --- | --- |
 | Data | Klassendiagram en data-model (PlantUML) | [class-diagram.md](class-diagram.md) |
 | Gebruiker | Wireframes van alle schermen + levelschets Level 1 | [wireframes](wireframes/README.md) |
-| Gebruiker | Use case diagram (PlantUML) | volgt (Osama) |
+| Gebruiker | Use case diagram (PlantUML) en beschrijvingen | [use-cases.md](use-cases.md) |
 | Logica | Activiteitendiagrammen (PlantUML), 12 stuks | [activiteitendiagrammen](activiteitendiagrammen/) |
 | Navigatie | Menu-flowchart | zie [Menu's en navigatie](#menus-en-navigatie) hierboven |
