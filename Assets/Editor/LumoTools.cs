@@ -35,6 +35,8 @@ public static class LumoTools
         BuildLightPlatform();
         BuildShadowWall();
         BuildPushBox();
+        BuildCheckpoint();
+        BuildLevelManager();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -91,6 +93,13 @@ public static class LumoTools
         PlacePrefab("LightPlatform", new Vector2(2f, FloorTop + 2.5f));
         PlacePrefab("HazardZone", new Vector2(5f, FloorTop + 0.5f));
         PlacePrefab("ShadowWall", new Vector2(11f, FloorTop + 1.5f));
+
+        // #20: LevelManager met startpunt, en een checkpoint tussen lamp en poel.
+        var start = new GameObject("Start");
+        start.transform.position = new Vector2(-13.5f, FloorTop + 0.75f);
+        GameObject levelManager = PlacePrefab("LevelManager", Vector2.zero);
+        SetField(levelManager.GetComponent<LevelManager>(), "startPoint", start.transform);
+        PlacePrefab("Checkpoint", new Vector2(-1f, FloorTop + 1f));
 
         // #18: twee test-spelers.
         PlaceDummy("Dummy Lumo", Shape.Light, new Vector2(-14f, FloorTop + 0.75f));
@@ -241,6 +250,22 @@ public static class LumoTools
         box.GetComponent<Rigidbody2D>().constraints =
             RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionX;
         SavePrefab(box, "PushBox");
+    }
+
+    private static void BuildCheckpoint()
+    {
+        var checkpoint = new GameObject("Checkpoint");
+        AddSprite(checkpoint, "lantaarn_uit");
+        Checkpoint script = checkpoint.AddComponent<Checkpoint>();
+        SetField(script, "litSprite", LoadTile("lantaarn_aan"));
+        SavePrefab(checkpoint, "Checkpoint");
+    }
+
+    private static void BuildLevelManager()
+    {
+        var levelManager = new GameObject("LevelManager");
+        levelManager.AddComponent<LevelManager>();
+        SavePrefab(levelManager, "LevelManager");
     }
 
     /// <summary>

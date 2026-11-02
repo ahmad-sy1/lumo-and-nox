@@ -31,6 +31,10 @@ class SwapManager <<MonoBehaviour>> {
   - Swap() : void
 }
 
+interface ISwapTimer {
+  + ResetTimer() : void
+}
+
 interface IPlayer {
   + CurrentShape : Shape
   + Die() : void
@@ -137,6 +141,8 @@ class PushBox <<MonoBehaviour>> {
 
 class Checkpoint <<MonoBehaviour>> {
   - isActive : bool
+  - passedPlayers : HashSet<GameObject>
+  - litSprite : Sprite
   # OnTriggerEnter2D(other : Collider2D) : void
 }
 
@@ -152,9 +158,13 @@ class ExitPortal <<MonoBehaviour>> {
 }
 
 class LevelManager <<MonoBehaviour>> {
+  - startPoint : Transform
   - deaths : int
   - elapsedTime : float
   - crystals : int
+  - isRespawning : bool
+  + Deaths : int
+  + ElapsedTime : float
   + OnPlayerDied() : void
   + SetCheckpoint(checkpoint : Checkpoint) : void
   + AddCrystal() : void
@@ -244,8 +254,9 @@ IPlayer <|.. PlayerDummy
 
 ' Wissel en level
 SwapManager --> "2" Player : players
-LevelManager --> "2" Player
-LevelManager --> "1" SwapManager
+LevelManager --> "2" IPlayer : Respawn()
+LevelManager --> "0..1" ISwapTimer : ResetTimer()
+ISwapTimer <|.. SwapManager
 LevelManager --> "0..1" Checkpoint : currentCheckpoint
 
 ' Zij roepen LevelManager aan
