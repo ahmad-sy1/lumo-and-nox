@@ -176,11 +176,18 @@ class LevelManager <<MonoBehaviour>> {
 
 class GameManager <<MonoBehaviour>> {
   + {static} Instance : GameManager
+  + {static} LevelNames : string[]
+  - data : SaveData
+  + Data : SaveData
   + LoadLevel(index : int) : void
+  + LoadMainMenu() : void
+  + ReloadScene() : void
   + LoadProgress() : void
   + SaveProgress(levelIndex : int, time : float, crystals : int) : void
   + SaveSettings() : void
   + ApplySettings() : void
+  + IsUnlocked(levelIndex : int) : bool
+  + FirstUnfinishedLevel() : int
 }
 
 class MainMenu <<MonoBehaviour>> {
