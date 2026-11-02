@@ -55,12 +55,16 @@ abstract class Activatable <<MonoBehaviour>> {
 
 class Lamp <<MonoBehaviour>> {
   - isOn : bool
+  - onSprite : Sprite
+  - offSprite : Sprite
   + Activate() : void
   + Deactivate() : void
 }
 
 class Door <<MonoBehaviour>> {
   - isOpen : bool
+  - openSprite : Sprite
+  - closedSprite : Sprite
   + Activate() : void
   + Deactivate() : void
 }

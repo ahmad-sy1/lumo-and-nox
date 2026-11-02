@@ -1,12 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Deur die open en dicht kan. Open: je loopt erdoorheen en hij is onzichtbaar. Dicht: hij blokkeert.
+/// Deur die open en dicht kan. Open: je loopt erdoorheen. Dicht: hij blokkeert.
+/// Met openSprite/closedSprite wisselt het plaatje mee; zonder openSprite is de open deur onzichtbaar.
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public class Door : Activatable
 {
     [SerializeField] private bool isOpen;
+    [SerializeField] private Sprite openSprite;
+    [SerializeField] private Sprite closedSprite;
 
     private void Start()
     {
@@ -38,7 +41,17 @@ public class Door : Activatable
 
         if (TryGetComponent(out SpriteRenderer spriteRenderer))
         {
-            spriteRenderer.enabled = solid;
+            Sprite sprite = solid ? closedSprite : openSprite;
+
+            if (sprite != null)
+            {
+                spriteRenderer.sprite = sprite;
+                spriteRenderer.enabled = true;
+            }
+            else
+            {
+                spriteRenderer.enabled = solid;
+            }
         }
     }
 }
