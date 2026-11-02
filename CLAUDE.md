@@ -20,6 +20,9 @@ Het volledige ontwerp staat in `docs/design.md`. Lees dat eerst als je iets over
 ## Regels
 
 - Bewerk nooit `.unity`, `.prefab` of `.meta` bestanden met de hand. Dat doen wij in de Unity-editor.
+- `.unity` en `.prefab` maken we niet met de hand, maar via `Assets/Editor/LumoTools.cs` (menu "Lumo & Nox"). Unity schrijft de bestanden dan zelf.
+- Nieuwe graphics: pas `tools/generate_tiles.py` aan en draai het opnieuw.
+- Testen doen we in `Assets/Scenes/Sandbox.unity`. Echte levels bouwen we pas in `Level1` en `Level2`.
 - Raak `Library/`, `Temp/`, `Logs/` en `UserSettings/` niet aan.
 - C#: PascalCase voor klassen en methodes, camelCase voor velden. Gebruik `[SerializeField] private` in plaats van `public` velden.
 - Houd scripts klein en simpel. Dit is een MVP van 3 weken, geen grote architectuur.
