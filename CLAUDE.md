@@ -33,12 +33,35 @@ Het volledige ontwerp staat in `docs/design.md`. Lees dat eerst als je iets over
 - Schrijf in het Nederlands, kort en simpel, in de wij-vorm.
 - Korte zinnen. Alleen wat nodig is voor de opdracht.
 
-## Git
+## Git en Scrum-board
 
-- Wij werken met GitHub issues en milestones (Sprint 1, 2 en 3). Elke taak is een issue.
-- Werk per taak op een eigen branch (bijvoorbeeld `feature/swap-manager`).
-- Zet in de PR `Closes #nummer`, zodat het issue sluit bij het mergen.
-- Zet de PR in dezelfde milestone als het issue.
+Wij werken met GitHub issues, milestones (Sprint 1, 2 en 3) en het project-board
+"Lumo & Nox – Scrum" (eigenaar `ahmad-sy1`). Kolommen: Product Backlog → Sprint Backlog →
+In Progress → In Review → Done. Elke taak is een issue.
+
+### Workflow per issue (altijd in deze volgorde)
+
+1. **Oppakken:** wijs het issue toe aan wie eraan werkt (`gh issue edit <nr> --add-assignee @me`)
+   en zet het op het board op **In Progress**.
+2. **Branch:** `feature/<nr>-<onderwerp>` (bijvoorbeeld `feature/17-lever-pressbutton`),
+   vanaf een verse `main`, tenzij er bewust gestapeld wordt op een open PR.
+3. **Bouwen:** volg de acceptatiecriteria van het issue en de gelinkte ontwerpbestanden.
+   Compileer in batchmode en check dat er geen `error CS` is.
+4. **PR maken:** push de branch en open een PR naar `main`:
+   - titel = titel van het issue
+   - beschrijving in het Nederlands: wat er gebouwd is, hoe je het test, en `Closes #<nr>`
+   - zelfde milestone als het issue, reviewer = de ander (Osama of Ahmad)
+   - bouwt de PR voort op een andere open PR: zet erin "Eerst #<andere PR> mergen".
+5. **Op review zetten:** voeg de PR toe aan het board en zet het issue op **In Review**.
+6. **Nooit zelf mergen.** De ander reviewt en merget. Door `Closes #<nr>` sluit het issue
+   en gaat de kaart naar **Done**.
+
+Board-status zetten gaat met `gh project item-edit` (zoek project-nummer, veld-ID's en
+optie-ID's eerst op met `gh project list --owner ahmad-sy1` en `gh project field-list`).
+
+### Overige afspraken
+
+- Pak geen issues op die aan iemand anders zijn toegewezen.
+- Push en PR maken mag zonder te vragen zodra de build slaagt. Mergen en force-pushen nooit.
 - Commit-berichten in het Engels, kort.
-- Push niet zonder het eerst te vragen.
 - Zet Claude nergens neer: geen `Co-Authored-By`, geen "Generated with Claude Code" in commits, PR's of issues.
