@@ -129,6 +129,7 @@ public static class UiBuilder
 
         Slider slider = go.GetComponent<Slider>();
         slider.colors = ButtonColors();
+        slider.value = 0.8f;
         return slider;
     }
 
@@ -147,11 +148,16 @@ public static class UiBuilder
         text.color = Palette.steenH;
         text.text = label;
         text.alignment = TextAnchor.MiddleLeft;
+        text.horizontalOverflow = HorizontalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
 
         // Groter vinkje, passend bij de tekst.
         var background = (RectTransform)go.transform.Find("Background");
         background.sizeDelta = new Vector2(40f, 40f);
         background.anchoredPosition = new Vector2(20f, -20f);
+        var checkmark = (RectTransform)background.Find("Checkmark");
+        checkmark.sizeDelta = new Vector2(36f, 36f);
+        checkmark.GetComponent<Image>().color = Palette.nachtS;
         var labelRect = (RectTransform)text.transform;
         labelRect.offsetMin = new Vector2(64f, labelRect.offsetMin.y);
         return toggle;

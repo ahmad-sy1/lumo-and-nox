@@ -20,7 +20,7 @@ De `LevelManager` is het centrum van een level. `Player`, `Checkpoint`, `Crystal
 
 `Palette` bevat de kleuren van Lumo en Nox als vaste waarden, dezelfde als in `tools/generate_tiles.py`. Zo gebruiken scripts (bijvoorbeeld voor licht of de HUD) precies dezelfde kleuren als de graphics.
 
-`OptionsMenu` is te openen vanuit het hoofdmenu en het pauzemenu. `Terug` gaat naar het scherm waar je vandaan kwam. Elke wijziging wordt meteen opgeslagen via `GameManager.SaveSettings()`. Bij het starten laadt de `GameManager` de instellingen en past ze toe met `ApplySettings()`. De `SwapManager` leest `flashWarning` om te bepalen of het scherm mag knipperen bij de wissel.
+`OptionsMenu` is te openen vanuit het hoofdmenu en het pauzemenu. `Terug` (of Esc) gaat naar het scherm waar je vandaan kwam: `Show()` krijgt dat scherm mee en zet het weer aan bij `Back()`. Het `PauseMenu` zet `Time.timeScale` op 0, zodat het spel en de wissel-timer stilstaan. Opnieuw laadt het level vanaf het begin. Elke wijziging wordt meteen opgeslagen via `GameManager.SaveSettings()`. Bij het starten laadt de `GameManager` de instellingen en past ze toe met `ApplySettings()`. De `SwapManager` leest `flashWarning` om te bepalen of het scherm mag knipperen bij de wissel.
 
 ## Data-model
 

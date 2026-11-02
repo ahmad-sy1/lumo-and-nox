@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private Button[] levelButtons;
     [SerializeField] private Text[] levelInfoTexts;
+    [SerializeField] private OptionsMenu optionsMenu;
 
     private void Start()
     {
@@ -51,6 +52,11 @@ public class MainMenu : MonoBehaviour
     {
         RefreshLevelSelect();
         ShowPanel(levelSelectPanel, levelButtons[0].gameObject);
+    }
+
+    public void OpenOptions()
+    {
+        optionsMenu.Show(mainPanel);
     }
 
     /// <summary>

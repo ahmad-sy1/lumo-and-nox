@@ -201,6 +201,7 @@ class MainMenu <<MonoBehaviour>> {
   + ShowStart() : void
   + ShowMain() : void
   + ShowLevelSelect() : void
+  + OpenOptions() : void
   + Play() : void
   + SelectLevel(index : int) : void
   + Quit() : void
@@ -214,9 +215,13 @@ class HUD <<MonoBehaviour>> {
 }
 
 class PauseMenu <<MonoBehaviour>> {
+  - panel : GameObject
+  - resumeButton : Button
+  - optionsMenu : OptionsMenu
   + Show() : void
   + Resume() : void
   + Restart() : void
+  + OpenOptions() : void
   + GoToMainMenu() : void
 }
 
@@ -225,7 +230,9 @@ class OptionsMenu <<MonoBehaviour>> {
   - sfxSlider : Slider
   - fullscreenToggle : Toggle
   - flashToggle : Toggle
-  + Show(cameFrom : string) : void
+  - panel : GameObject
+  + IsOpen : bool
+  + Show(cameFrom : GameObject) : void
   + OnSettingChanged() : void
   + Back() : void
 }
