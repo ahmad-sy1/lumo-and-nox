@@ -35,8 +35,8 @@ public static class LumoTools
         BuildZone<HazardZone>("HazardZone", "stekels", 2);
         BuildZone<DarkZone>("DarkZone", "donkere_poel", 2);
         BuildPlayerDummy();
-        BuildPlayer("Lumo", "lumo_schaduw_sheet", Player.Controls.Wasd, Shape.Light, 14f, false);
-        BuildPlayer("Nox", "nox_schaduw_sheet", Player.Controls.Arrows, Shape.Shadow, 12f, true);
+        BuildPlayer("Lumo", "lumo_licht_sheet", "lumo_schaduw_sheet", Player.Controls.Wasd, Shape.Light, 14f, false);
+        BuildPlayer("Nox", "nox_licht_sheet", "nox_schaduw_sheet", Player.Controls.Arrows, Shape.Shadow, 12f, true);
         BuildLightPlatform();
         BuildShadowWall();
         BuildPushBox();
@@ -626,14 +626,18 @@ public static class LumoTools
         return card;
     }
 
-    private static void BuildPlayer(string name, string sheet, Player.Controls controls, Shape startShape,
-        float jumpForce, bool canPushBoxes)
+    private static void BuildPlayer(string name, string lightSheet, string shadowSheet, Player.Controls controls,
+        Shape startShape, float jumpForce, bool canPushBoxes)
     {
         var player = new GameObject(name);
         player.tag = "Player";
 
+        // Ontbreekt een sheet, dan gebruiken we voorlopig het plaatje van de andere vorm.
+        Sprite shadowSprite = LoadCharacterSprite(shadowSheet);
+        Sprite lightSprite = LoadCharacterSprite(lightSheet) ?? shadowSprite;
+
         SpriteRenderer renderer = player.AddComponent<SpriteRenderer>();
-        renderer.sprite = LoadCharacterSprite(sheet);
+        renderer.sprite = startShape == Shape.Light ? lightSprite : shadowSprite;
         renderer.sortingOrder = 5;
 
         var body = player.AddComponent<Rigidbody2D>();
@@ -648,6 +652,8 @@ public static class LumoTools
         Player script = player.AddComponent<Player>();
         SetEnum(script, "controls", (int)controls);
         SetEnum(script, "startShape", (int)startShape);
+        SetField(script, "lightSprite", lightSprite);
+        SetField(script, "shadowSprite", shadowSprite);
         SetFloat(script, "jumpForce", jumpForce);
         SetBool(script, "canPushBoxes", canPushBoxes);
 
@@ -827,7 +833,7 @@ public static class LumoTools
             }
         }
 
-        Debug.LogError("Lumo & Nox: karakter-sheet niet gevonden: " + sheet);
+        Debug.LogWarning("Lumo & Nox: karakter-sheet niet gevonden: " + sheet);
         return null;
     }
 

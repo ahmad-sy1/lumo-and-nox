@@ -17,15 +17,20 @@ class Player <<MonoBehaviour>> {
   ' Lumo en Nox zijn twee instanties met andere instellingen
   - controls : Controls
   - startShape : Shape
+  - lightSprite : Sprite
+  - shadowSprite : Sprite
+  - glowRadius : float
   - jumpForce : float
   - canPushBoxes : bool
   - moveSpeed : float
   - isGrounded : bool
   - isDead : bool
+  - isUsingAbility : bool
   + CurrentShape : Shape
   + Move(direction : float) : void
   + Jump() : void
   + UseAbility() : void
+  + StopAbility() : void
   + Interact() : void
   + SetShape(newShape : Shape) : void
   + Die() : void
