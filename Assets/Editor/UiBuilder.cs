@@ -17,7 +17,7 @@ public static class UiBuilder
     public const int LargeText = 64;
     public const int TitleText = 112;
 
-    private const string FontRegular = "Assets/Art/Fonts/Silkscreen-Regular.ttf";
+    public const string FontRegular = "Assets/Art/Fonts/Silkscreen-Regular.ttf";
     private const string FontBold = "Assets/Art/Fonts/Silkscreen-Bold.ttf";
     private const string FontTitle = "Assets/Art/Fonts/PressStart2P-Regular.ttf";
 

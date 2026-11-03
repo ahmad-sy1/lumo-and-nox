@@ -16,13 +16,13 @@ public static class LumoTools
     private const string SandboxPath = "Assets/Scenes/Sandbox.unity";
     private const string MainMenuPath = "Assets/Scenes/MainMenu.unity";
     private const string MenuArtPath = "Assets/Art/Menu/scene_preview.png";
-    private const string SquareSpritePath =
+    public const string SquareSpritePath =
         "Packages/com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Square.png";
 
     // Zichtbaar deel van de Sandbox: 30 x 17 tegels (16:9).
-    private const int ViewWidth = 30;
-    private const int ViewHeight = 17;
-    private const float FloorTop = -ViewHeight / 2f + 2f;
+    public const int ViewWidth = 30;
+    public const int ViewHeight = 17;
+    public const float FloorTop = -ViewHeight / 2f + 2f;
 
     [MenuItem("Lumo & Nox/Build prefabs")]
     public static void BuildPrefabs()
@@ -55,13 +55,14 @@ public static class LumoTools
     }
 
     /// <summary>
-    /// Alles in één keer: prefabs, Sandbox en hoofdmenu.
+    /// Alles in één keer: prefabs, Sandbox, hoofdmenu en Level 1.
     /// </summary>
     [MenuItem("Lumo & Nox/Build all")]
     public static void BuildAll()
     {
         BuildSandbox();
         BuildMainMenuScene();
+        Level1Builder.Build();
     }
 
     /// <summary>
@@ -399,7 +400,7 @@ public static class LumoTools
     /// <summary>
     /// Blok van width x height tegels als children, met één BoxCollider2D op de root.
     /// </summary>
-    private static GameObject CreateTileBlock(string name, string tile, int width, int height = 1)
+    public static GameObject CreateTileBlock(string name, string tile, int width, int height = 1)
     {
         var root = new GameObject(name);
         for (int x = 0; x < width; x++)
@@ -662,7 +663,7 @@ public static class LumoTools
 
     // ---------- Sandbox ----------
 
-    private static void CreateCamera()
+    public static void CreateCamera()
     {
         var go = new GameObject("Main Camera");
         go.tag = "MainCamera";
@@ -676,14 +677,14 @@ public static class LumoTools
         go.AddComponent<UniversalAdditionalCameraData>();
     }
 
-    private static void CreateGlobalLight()
+    public static void CreateGlobalLight()
     {
         var go = new GameObject("Global Light 2D");
         Light2D light = go.AddComponent<Light2D>();
         light.lightType = Light2D.LightType.Global;
     }
 
-    private static void CreateBackground()
+    public static void CreateBackground()
     {
         var square = AssetDatabase.LoadAssetAtPath<Sprite>(SquareSpritePath);
         if (square == null)
@@ -727,7 +728,7 @@ public static class LumoTools
         collider.offset = new Vector2(0f, FloorTop - 1f);
     }
 
-    private static void CreateTile(GameObject parent, string tile, Vector2 position)
+    public static void CreateTile(GameObject parent, string tile, Vector2 position)
     {
         var go = new GameObject(tile);
         go.transform.SetParent(parent.transform, false);
@@ -735,7 +736,7 @@ public static class LumoTools
         AddSprite(go, tile);
     }
 
-    private static GameObject PlacePrefab(string name, Vector2 position, string instanceName = null)
+    public static GameObject PlacePrefab(string name, Vector2 position, string instanceName = null)
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabsFolder + name + ".prefab");
         var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
