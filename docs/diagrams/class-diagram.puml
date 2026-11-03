@@ -273,10 +273,16 @@ note right of SaveData
   zie data-model.puml
 end note
 
+class SpriteLoop <<MonoBehaviour>> {
+  - frames : Sprite[]
+  - framesPerSecond : float
+}
+
 class Palette <<static>> {
   + {static} steen : Color
   + {static} rots : Color
   + {static} kristal : Color
+  + {static} gevaar : Color
   ...
 }
 

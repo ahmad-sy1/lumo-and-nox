@@ -37,4 +37,8 @@ public static class Palette
     public static readonly Color houtD = new Color32(82, 56, 40, 255);
     public static readonly Color ijzer = new Color32(92, 96, 120, 255);
     public static readonly Color ijzerH = new Color32(140, 146, 170, 255);
+
+    // Gevaar: alleen voor gevaren in de wereld, nooit voor UI
+    public static readonly Color gevaar = new Color32(255, 77, 109, 255);
+    public static readonly Color gevaarD = new Color32(150, 34, 82, 255);
 }
