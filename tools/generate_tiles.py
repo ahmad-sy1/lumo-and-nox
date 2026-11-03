@@ -493,12 +493,25 @@ SPRITES = {
 }
 
 
+def save_if_changed(im, path):
+    """Slaat alleen op als de pixels anders zijn, zodat git geen gelijke plaatjes als gewijzigd ziet."""
+    pixels = im.convert("RGBA")
+    if os.path.exists(path):
+        with Image.open(path) as old:
+            if old.size == pixels.size and old.convert("RGBA").tobytes() == pixels.tobytes():
+                return False
+    pixels.save(path)
+    return True
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join("Assets", "Art", "Tiles")
     os.makedirs(out, exist_ok=True)
+    changed = 0
     for name, fn in SPRITES.items():
-        fn().save(os.path.join(out, f"{name}.png"))
-    print(f"{len(SPRITES)} sprites geschreven naar {out}")
+        if save_if_changed(fn(), os.path.join(out, f"{name}.png")):
+            changed += 1
+    print(f"{changed} van {len(SPRITES)} sprites veranderd in {out}")
 
 
 if __name__ == "__main__":
