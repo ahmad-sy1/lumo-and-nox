@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -769089845397687356, guid: 3cc5901ecd3df434f93d288deea8c436, type: 3}
+  m_Sprite: {fileID: 6314958836790408515, guid: efb22cb6510524874a9ef988941dede3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   controls: 0
   startShape: 0
-  lightSprite: {fileID: -769089845397687356, guid: 3cc5901ecd3df434f93d288deea8c436, type: 3}
+  lightSprite: {fileID: 6314958836790408515, guid: efb22cb6510524874a9ef988941dede3, type: 3}
   shadowSprite: {fileID: -769089845397687356, guid: 3cc5901ecd3df434f93d288deea8c436, type: 3}
   glowRadius: 4
   moveSpeed: 6
