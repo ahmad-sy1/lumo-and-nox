@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 /// <summary>
 /// Menu "Lumo & Nox": maakt prefabs en de Sandbox-scene vanuit code, zodat we .prefab en .unity
@@ -13,6 +14,8 @@ public static class LumoTools
     private const string TilesFolder = "Assets/Art/Tiles/";
     private const string PrefabsFolder = "Assets/Prefabs/";
     private const string SandboxPath = "Assets/Scenes/Sandbox.unity";
+    private const string MainMenuPath = "Assets/Scenes/MainMenu.unity";
+    private const string MenuArtPath = "Assets/Art/Menu/scene_preview.png";
     private const string SquareSpritePath =
         "Packages/com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Square.png";
 
@@ -41,10 +44,47 @@ public static class LumoTools
         BuildLevelManager();
         BuildCrystal();
         BuildExitPortal();
+        BuildGameManager();
+        BuildWinScreen();
+        BuildOptionsMenu();
+        BuildPauseMenu();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
         Debug.Log("Lumo & Nox: prefabs gebouwd in " + PrefabsFolder);
+    }
+
+    /// <summary>
+    /// Alles in één keer: prefabs, Sandbox en hoofdmenu.
+    /// </summary>
+    [MenuItem("Lumo & Nox/Build all")]
+    public static void BuildAll()
+    {
+        BuildSandbox();
+        BuildMainMenuScene();
+    }
+
+    /// <summary>
+    /// Bouwt MainMenu.unity: startscherm, hoofdmenu en level select (wireframes 01-03).
+    /// </summary>
+    [MenuItem("Lumo & Nox/Build MainMenu scene")]
+    public static void BuildMainMenuScene()
+    {
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            return;
+        }
+
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        CreateCamera();
+        UiBuilder.CreateEventSystem();
+        PlacePrefab("GameManager", Vector2.zero);
+        MainMenu menu = BuildMainMenuCanvas();
+        GameObject options = PlacePrefab("OptionsMenu", Vector2.zero);
+        SetField(menu, "optionsMenu", options.GetComponent<OptionsMenu>());
+
+        EditorSceneManager.SaveScene(scene, MainMenuPath);
+        Debug.Log("Lumo & Nox: hoofdmenu opgeslagen in " + MainMenuPath);
     }
 
     /// <summary>
@@ -111,6 +151,18 @@ public static class LumoTools
         PlacePrefab("Crystal", new Vector2(2f, FloorTop + 4f), "Crystal 2");
         PlacePrefab("Crystal", new Vector2(8f, FloorTop + 7f), "Crystal 3");
         PlacePrefab("ExitPortal", new Vector2(13.5f, FloorTop + 1f));
+
+        // #22: GameManager (blijft bestaan tussen scenes, beheert save.json).
+        PlacePrefab("GameManager", Vector2.zero);
+
+        // #25: winscherm (verschijnt bij FinishLevel) en een EventSystem voor de knoppen.
+        PlacePrefab("WinScreen", Vector2.zero);
+        UiBuilder.CreateEventSystem();
+
+        // #24: pauzemenu (Esc) met opties.
+        GameObject options = PlacePrefab("OptionsMenu", Vector2.zero);
+        GameObject pause = PlacePrefab("PauseMenu", Vector2.zero);
+        SetField(pause.GetComponent<PauseMenu>(), "optionsMenu", options.GetComponent<OptionsMenu>());
 
         // #11: de echte spelers. De PlayerDummy-prefab blijft bestaan voor losse tests.
         PlacePrefab("Lumo", new Vector2(-14f, FloorTop + 1f));
@@ -283,6 +335,60 @@ public static class LumoTools
         SavePrefab(portal, "ExitPortal");
     }
 
+    private static void BuildGameManager()
+    {
+        var gameManager = new GameObject("GameManager");
+        gameManager.AddComponent<GameManager>();
+        SavePrefab(gameManager, "GameManager");
+    }
+
+    private static void BuildWinScreen()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("WinScreen", 20);
+        WinScreen script = canvas.gameObject.AddComponent<WinScreen>();
+        GameObject panel = UiBuilder.CreateFullPanel(canvas.transform, "Panel", new Color(Palette.nachtS.r, Palette.nachtS.g, Palette.nachtS.b, 0.92f));
+        Transform p = panel.transform;
+
+        UiBuilder.CreateTitle(p, "Title", "Level voltooid!", 88, Palette.goud, new Vector2(0f, 360f), new Vector2(1600f, 140f));
+        Text levelText = UiBuilder.CreateText(p, "Level", "Level 1", UiBuilder.NormalText, Palette.steen, new Vector2(0f, 250f), new Vector2(1200f, 60f));
+
+        Text timeText = CreateStatCard(p, "Tijd", -560f);
+        Text deathText = CreateStatCard(p, "Keer doodgegaan", 560f);
+
+        // Kristallen: drie iconen en x/3.
+        GameObject crystalCard = UiBuilder.CreateImage(p, "Kristallen", Palette.nachtL, new Vector2(0f, 40f), new Vector2(480f, 260f));
+        UiBuilder.CreateText(crystalCard.transform, "Label", "Kristallen", UiBuilder.SmallText, Palette.steenS, new Vector2(0f, 85f), new Vector2(460f, 50f));
+        var icons = new Image[3];
+        for (int i = 0; i < icons.Length; i++)
+        {
+            GameObject icon = UiBuilder.CreateImage(crystalCard.transform, "Kristal" + i, Color.white, new Vector2((i - 1) * 90f, 5f), new Vector2(72f, 72f));
+            icons[i] = icon.GetComponent<Image>();
+            icons[i].sprite = LoadTile("kristal");
+        }
+        Text crystalText = UiBuilder.CreateText(crystalCard.transform, "Value", "0/3", UiBuilder.NormalText, Palette.steenH, new Vector2(0f, -85f), new Vector2(460f, 60f), bold: true);
+
+        Button next = UiBuilder.CreateButton(p, "Volgend level", "Volgend level", new Vector2(-560f, -220f), new Vector2(520f, 100f), script.NextLevel);
+        UiBuilder.CreateButton(p, "Opnieuw", "Opnieuw", new Vector2(0f, -220f), new Vector2(480f, 100f), script.Restart);
+        UiBuilder.CreateButton(p, "Hoofdmenu", "Hoofdmenu", new Vector2(560f, -220f), new Vector2(480f, 100f), script.GoToMainMenu);
+
+        SetField(script, "panel", panel);
+        SetField(script, "levelText", levelText);
+        SetField(script, "timeText", timeText);
+        SetField(script, "crystalText", crystalText);
+        SetField(script, "deathText", deathText);
+        SetField(script, "nextButton", next);
+        SetArray(script, "crystalIcons", icons);
+
+        SavePrefab(canvas.gameObject, "WinScreen");
+    }
+
+    private static Text CreateStatCard(Transform parent, string label, float x)
+    {
+        GameObject card = UiBuilder.CreateImage(parent, label, Palette.nachtL, new Vector2(x, 40f), new Vector2(480f, 260f));
+        UiBuilder.CreateText(card.transform, "Label", label, UiBuilder.SmallText, Palette.steenS, new Vector2(0f, 85f), new Vector2(460f, 50f));
+        return UiBuilder.CreateText(card.transform, "Value", "-", UiBuilder.LargeText, Palette.steenH, new Vector2(0f, -10f), new Vector2(460f, 100f), bold: true);
+    }
+
     private static void BuildLevelManager()
     {
         var levelManager = new GameObject("LevelManager");
@@ -329,6 +435,195 @@ public static class LumoTools
         dummy.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
 
         SavePrefab(dummy, "PlayerDummy");
+    }
+
+    // ---------- Hoofdmenu ----------
+
+    private static MainMenu BuildMainMenuCanvas()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("MainMenu", 0);
+        MainMenu menu = canvas.gameObject.AddComponent<MainMenu>();
+        Transform root = canvas.transform;
+
+        // Achtergrond: licht links, schaduw rechts.
+        UiBuilder.CreateFullPanel(root, "Achtergrond", Palette.nachtS);
+        var lightHalf = (RectTransform)UiBuilder.CreateFullPanel(root, "Licht", Palette.nachtL).transform;
+        lightHalf.anchorMax = new Vector2(0.5f, 1f);
+
+        // 01 Startscherm: het hele scherm is één knop (klik of Enter).
+        GameObject start = UiBuilder.CreateFullPanel(root, "Startscherm", Color.clear);
+        Button startButton = start.AddComponent<Button>();
+        startButton.transition = Selectable.Transition.None;
+        UnityEditor.Events.UnityEventTools.AddPersistentListener(startButton.onClick, menu.ShowMain);
+        Transform s = start.transform;
+        CreateCircle(s, "Lumo", "Lumo (licht)", Palette.goud, -130f);
+        CreateCircle(s, "Nox", "Nox (schaduw)", Palette.doorn, 130f);
+        UiBuilder.CreateTitle(s, "Title", "LUMO & NOX", 128, Palette.goud, new Vector2(0f, 0f), new Vector2(1800f, 180f));
+        UiBuilder.CreateText(s, "Subtitle", "co-op puzzel-platformer voor twee spelers", UiBuilder.SmallText, Palette.steen, new Vector2(0f, -110f), new Vector2(1600f, 50f));
+        Text pressEnter = UiBuilder.CreateText(s, "Druk op Enter", "Druk op Enter om te beginnen", UiBuilder.NormalText, Palette.steenH, new Vector2(0f, -300f), new Vector2(1600f, 60f));
+
+        // 02 Hoofdmenu.
+        GameObject main = UiBuilder.CreateFullPanel(root, "Hoofdmenu", Color.clear);
+        Transform m = main.transform;
+        UiBuilder.CreateTitle(m, "Title", "LUMO & NOX", 72, Palette.goud, new Vector2(-520f, 360f), new Vector2(900f, 140f));
+        Vector2 buttonSize = new Vector2(640f, 100f);
+        Button play = UiBuilder.CreateButton(m, "Spelen", "Spelen", new Vector2(-520f, 170f), buttonSize, menu.Play);
+        UiBuilder.CreateButton(m, "Level select", "Level select", new Vector2(-520f, 50f), buttonSize, menu.ShowLevelSelect);
+        UiBuilder.CreateButton(m, "Opties", "Opties", new Vector2(-520f, -70f), buttonSize, menu.OpenOptions);
+        UiBuilder.CreateButton(m, "Afsluiten", "Afsluiten", new Vector2(-520f, -190f), buttonSize, menu.Quit);
+        CreateMenuArt(m, new Vector2(440f, 20f), new Vector2(880f, 411f));
+        UiBuilder.CreateText(m, "Hint", "Pijltjes: kiezen   Enter: bevestigen   muis werkt ook", 24, Palette.steenS, new Vector2(-520f, -420f), new Vector2(1000f, 40f));
+
+        // 03 Level select.
+        GameObject select = UiBuilder.CreateFullPanel(root, "Level select", Color.clear);
+        Transform l = select.transform;
+        UiBuilder.CreateButton(l, "Terug", "< Terug", new Vector2(-760f, 420f), new Vector2(280f, 90f), menu.ShowMain);
+        UiBuilder.CreateTitle(l, "Title", "Kies een level", 56, Palette.goud, new Vector2(60f, 420f), new Vector2(1000f, 120f));
+        var levelButtons = new Button[2];
+        var levelInfos = new Text[2];
+        string[] subtitles = { "Tutorial - wissel elke 30 s", "Samenwerken - wissel elke 20 s" };
+        for (int i = 0; i < levelButtons.Length; i++)
+        {
+            levelButtons[i] = CreateLevelCard(l, i, subtitles[i], i == 0 ? -450f : 450f, out levelInfos[i]);
+            UiBuilder.AddClick(levelButtons[i], menu.SelectLevel, i);
+        }
+        UiBuilder.CreateText(l, "Hint", "Klik of Enter op een kaart   Esc of Terug: hoofdmenu", 24, Palette.steenS, new Vector2(0f, -420f), new Vector2(1600f, 40f));
+
+        SetField(menu, "startPanel", start);
+        SetField(menu, "mainPanel", main);
+        SetField(menu, "levelSelectPanel", select);
+        SetField(menu, "pressEnterText", pressEnter);
+        SetField(menu, "playButton", play);
+        SetArray(menu, "levelButtons", levelButtons);
+        SetArray(menu, "levelInfoTexts", levelInfos);
+        return menu;
+    }
+
+    // ---------- Pauze en opties ----------
+
+    private static void BuildPauseMenu()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("PauseMenu", 25);
+        PauseMenu script = canvas.gameObject.AddComponent<PauseMenu>();
+
+        // Het spel blijft vaag zichtbaar achter het menu.
+        GameObject panel = UiBuilder.CreateFullPanel(canvas.transform, "Panel", new Color(Palette.nachtS.r, Palette.nachtS.g, Palette.nachtS.b, 0.85f));
+        GameObject box = UiBuilder.CreateImage(panel.transform, "Box", Palette.nachtL, Vector2.zero, new Vector2(760f, 720f));
+        Transform b = box.transform;
+        UiBuilder.CreateTitle(b, "Title", "Gepauzeerd", 56, Palette.goud, new Vector2(0f, 250f), new Vector2(720f, 100f));
+
+        Vector2 size = new Vector2(600f, 100f);
+        Button resume = UiBuilder.CreateButton(b, "Verder", "Verder", new Vector2(0f, 110f), size, script.Resume);
+        UiBuilder.CreateButton(b, "Opnieuw", "Opnieuw", new Vector2(0f, -10f), size, script.Restart);
+        UiBuilder.CreateButton(b, "Opties", "Opties", new Vector2(0f, -130f), size, script.OpenOptions);
+        UiBuilder.CreateButton(b, "Hoofdmenu", "Hoofdmenu", new Vector2(0f, -250f), size, script.GoToMainMenu);
+        UiBuilder.CreateText(panel.transform, "Hint", "Esc: verder", 24, Palette.steenS, new Vector2(0f, -420f), new Vector2(800f, 40f));
+
+        SetField(script, "panel", panel);
+        SetField(script, "resumeButton", resume);
+        SavePrefab(canvas.gameObject, "PauseMenu");
+    }
+
+    private static void BuildOptionsMenu()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("OptionsMenu", 30);
+        OptionsMenu script = canvas.gameObject.AddComponent<OptionsMenu>();
+        GameObject panel = UiBuilder.CreateFullPanel(canvas.transform, "Panel", Palette.nachtS);
+        Transform p = panel.transform;
+
+        UiBuilder.CreateButton(p, "Terug", "< Terug", new Vector2(-760f, 420f), new Vector2(280f, 90f), script.Back);
+        UiBuilder.CreateTitle(p, "Title", "Opties", 56, Palette.goud, new Vector2(-300f, 420f), new Vector2(500f, 100f));
+
+        // Links: geluid en weergave.
+        CreateLabel(p, "Geluid", -880f, 300f, UiBuilder.NormalText, Palette.goud);
+        CreateLabel(p, "Muziek", -880f, 220f, UiBuilder.SmallText, Palette.steenH);
+        Slider music = UiBuilder.CreateSlider(p, "Muziek slider", new Vector2(-150f, 220f), new Vector2(340f, 40f));
+        CreateLabel(p, "Geluidseffecten", -880f, 140f, UiBuilder.SmallText, Palette.steenH);
+        Slider sfx = UiBuilder.CreateSlider(p, "Effecten slider", new Vector2(-150f, 140f), new Vector2(340f, 40f));
+
+        CreateLabel(p, "Weergave", -880f, 20f, UiBuilder.NormalText, Palette.goud);
+        CreateLabel(p, "Volledig scherm", -880f, -60f, UiBuilder.SmallText, Palette.steenH);
+        Toggle fullscreen = UiBuilder.CreateToggle(p, "Volledig scherm toggle", "", new Vector2(-150f, -60f), new Vector2(340f, 40f));
+        CreateLabel(p, "Knipperen bij wissel", -880f, -140f, UiBuilder.SmallText, Palette.steenH);
+        Toggle flash = UiBuilder.CreateToggle(p, "Knipperen toggle", "Rustig", new Vector2(-150f, -140f), new Vector2(340f, 40f));
+        UiBuilder.CreateText(p, "Uitleg", "Uit = alleen piep + rode timerbalk, veilig voor flitsgevoelige spelers", 24, Palette.steenS,
+            new Vector2(-480f, -240f), new Vector2(880f, 70f), TextAnchor.UpperLeft);
+
+        foreach (Slider slider in new[] { music, sfx })
+        {
+            UnityEditor.Events.UnityEventTools.AddVoidPersistentListener(slider.onValueChanged, script.OnSettingChanged);
+        }
+        foreach (Toggle toggle in new[] { fullscreen, flash })
+        {
+            UnityEditor.Events.UnityEventTools.AddVoidPersistentListener(toggle.onValueChanged, script.OnSettingChanged);
+        }
+
+        // Rechts: besturing (alleen bekijken).
+        CreateLabel(p, "Besturing (alleen bekijken)", 20f, 300f, UiBuilder.NormalText, Palette.goud, 900f);
+        UiBuilder.CreateImage(p, "Tabel", Palette.nachtL, new Vector2(460f, 60f), new Vector2(880f, 400f));
+        string[,] rows =
+        {
+            { "Actie", "Lumo", "Nox" },
+            { "Lopen", "A / D", "Pijl links/rechts" },
+            { "Springen", "W", "Pijl omhoog" },
+            { "Kracht", "S", "Pijl omlaag" },
+            { "Hendel / knop", "E", "Rechter Shift" },
+            { "Pauze", "Esc", "Esc" },
+        };
+        float[] columns = { 50f, 400f, 580f };
+        for (int r = 0; r < rows.GetLength(0); r++)
+        {
+            for (int c = 0; c < columns.Length; c++)
+            {
+                CreateLabel(p, rows[r, c], columns[c], 210f - r * 60f, 24, r == 0 ? Palette.goud : Palette.steenH, c == 2 ? 360f : 340f);
+            }
+        }
+        UiBuilder.CreateText(p, "Opslaan", "Instellingen worden lokaal opgeslagen, net als de voortgang", 24, Palette.steenS,
+            new Vector2(460f, -200f), new Vector2(880f, 70f), TextAnchor.UpperLeft);
+
+        SetField(script, "panel", panel);
+        SetField(script, "musicSlider", music);
+        SetField(script, "sfxSlider", sfx);
+        SetField(script, "fullscreenToggle", fullscreen);
+        SetField(script, "flashToggle", flash);
+        SavePrefab(canvas.gameObject, "OptionsMenu");
+    }
+
+    /// <summary>
+    /// Tekst die links begint op x (pixels vanaf het midden van het scherm).
+    /// </summary>
+    private static void CreateLabel(Transform parent, string text, float left, float y, int fontSize, Color color, float width = 560f)
+    {
+        UiBuilder.CreateText(parent, text, text, fontSize, color, new Vector2(left + width / 2f, y), new Vector2(width, 60f), TextAnchor.MiddleLeft);
+    }
+
+    private static void CreateCircle(Transform parent, string name, string label, Color color, float x)
+    {
+        GameObject circle = UiBuilder.CreateImage(parent, name, color, new Vector2(x, 260f), new Vector2(150f, 150f));
+        circle.GetComponent<Image>().sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+        UiBuilder.CreateText(parent, name + " label", label, 24, Palette.steen, new Vector2(x, 160f), new Vector2(260f, 40f));
+    }
+
+    private static void CreateMenuArt(Transform parent, Vector2 position, Vector2 size)
+    {
+        GameObject art = UiBuilder.CreateImage(parent, "Achtergrondbeeld", Color.white, position, size);
+        Image image = art.GetComponent<Image>();
+        image.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(MenuArtPath);
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+    }
+
+    private static Button CreateLevelCard(Transform parent, int index, string subtitle, float x, out Text info)
+    {
+        Button card = UiBuilder.CreateButton(parent, "Level " + (index + 1), "", new Vector2(x, -30f), new Vector2(840f, 640f));
+        Object.DestroyImmediate(card.transform.Find("Label").gameObject);
+        Transform c = card.transform;
+
+        CreateMenuArt(c, new Vector2(0f, 130f), new Vector2(780f, 364f));
+        UiBuilder.CreateText(c, "Title", GameManager.LevelNames[index].Replace('–', '-'), UiBuilder.NormalText, Palette.nachtS, new Vector2(0f, -110f), new Vector2(800f, 60f), bold: true);
+        UiBuilder.CreateText(c, "Subtitle", subtitle, UiBuilder.SmallText, Palette.nachtS, new Vector2(0f, -170f), new Vector2(800f, 50f));
+        info = UiBuilder.CreateText(c, "Info", "", 24, Palette.nachtS, new Vector2(0f, -240f), new Vector2(800f, 60f));
+        return card;
     }
 
     private static void BuildPlayer(string name, string lightSheet, string shadowSheet, Player.Controls controls,
@@ -489,6 +784,18 @@ public static class LumoTools
     {
         var serialized = new SerializedObject(target);
         serialized.FindProperty(field).objectReferenceValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetArray(Object target, string field, Object[] values)
+    {
+        var serialized = new SerializedObject(target);
+        SerializedProperty array = serialized.FindProperty(field);
+        array.arraySize = values.Length;
+        for (int i = 0; i < values.Length; i++)
+        {
+            array.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+        }
         serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 

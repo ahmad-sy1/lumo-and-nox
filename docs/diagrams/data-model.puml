@@ -16,6 +16,7 @@ end note
 class SaveData {
   + levels : LevelProgress[]
   + settings : Settings
+  + {static} CreateDefault(levelCount : int) : SaveData
 }
 
 class LevelProgress {

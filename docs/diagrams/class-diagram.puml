@@ -173,6 +173,7 @@ class ExitPortal <<MonoBehaviour>> {
 }
 
 class LevelManager <<MonoBehaviour>> {
+  - levelIndex : int
   - startPoint : Transform
   - deaths : int
   - elapsedTime : float
@@ -191,14 +192,31 @@ class LevelManager <<MonoBehaviour>> {
 
 class GameManager <<MonoBehaviour>> {
   + {static} Instance : GameManager
+  + {static} LevelNames : string[]
+  - data : SaveData
+  + Data : SaveData
   + LoadLevel(index : int) : void
+  + LoadMainMenu() : void
+  + ReloadScene() : void
   + LoadProgress() : void
   + SaveProgress(levelIndex : int, time : float, crystals : int) : void
   + SaveSettings() : void
   + ApplySettings() : void
+  + {static} FormatTime(seconds : float) : string
+  + IsUnlocked(levelIndex : int) : bool
+  + FirstUnfinishedLevel() : int
 }
 
 class MainMenu <<MonoBehaviour>> {
+  - startPanel : GameObject
+  - mainPanel : GameObject
+  - levelSelectPanel : GameObject
+  - levelButtons : Button[]
+  - levelInfoTexts : Text[]
+  + ShowStart() : void
+  + ShowMain() : void
+  + ShowLevelSelect() : void
+  + OpenOptions() : void
   + Play() : void
   + SelectLevel(index : int) : void
   + Quit() : void
@@ -212,9 +230,13 @@ class HUD <<MonoBehaviour>> {
 }
 
 class PauseMenu <<MonoBehaviour>> {
+  - panel : GameObject
+  - resumeButton : Button
+  - optionsMenu : OptionsMenu
   + Show() : void
   + Resume() : void
   + Restart() : void
+  + OpenOptions() : void
   + GoToMainMenu() : void
 }
 
@@ -223,17 +245,25 @@ class OptionsMenu <<MonoBehaviour>> {
   - sfxSlider : Slider
   - fullscreenToggle : Toggle
   - flashToggle : Toggle
-  + Show(cameFrom : string) : void
+  - panel : GameObject
+  + IsOpen : bool
+  + Show(cameFrom : GameObject) : void
   + OnSettingChanged() : void
   + Back() : void
 }
 
 class WinScreen <<MonoBehaviour>> {
-  - timeText : TextMeshProUGUI
-  - crystalText : TextMeshProUGUI
-  - deathText : TextMeshProUGUI
-  + Show(time : float, crystals : int, deaths : int) : void
+  - panel : GameObject
+  - levelText : Text
+  - timeText : Text
+  - crystalText : Text
+  - deathText : Text
+  - crystalIcons : Image[]
+  - nextButton : Button
+  + Show(levelIndex : int, time : float, crystals : int, deaths : int) : void
   + NextLevel() : void
+  + Restart() : void
+  + GoToMainMenu() : void
 }
 
 class SaveData {
@@ -293,6 +323,7 @@ PressButton ..> "0..*" PushBox : telt mee
 HUD --> "1" SwapManager
 HUD --> "1" LevelManager
 LevelManager --> "1" WinScreen
+LevelManager ..> "1" GameManager : SaveProgress()
 MainMenu ..> "1" GameManager
 PauseMenu ..> "1" GameManager
 WinScreen ..> "1" GameManager
