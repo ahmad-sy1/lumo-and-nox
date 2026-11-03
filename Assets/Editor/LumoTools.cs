@@ -685,6 +685,7 @@ public static class LumoTools
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = Palette.nachtS;
         go.AddComponent<UniversalAdditionalCameraData>();
+        go.AddComponent<AudioListener>();
     }
 
     private static void CreateGlobalLight()

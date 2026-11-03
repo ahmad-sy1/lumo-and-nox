@@ -80,6 +80,7 @@ public class SwapManager : MonoBehaviour, ISwapTimer
     private void Warn()
     {
         warned = true;
+        Debug.Log("SwapManager: waarschuwing, wissel over " + Mathf.CeilToInt(timeLeft) + " s", this);
         audioSource.volume = GameManager.Instance.Data.settings.sfxVolume;
         audioSource.Play();
         WarningStarted?.Invoke();
@@ -92,23 +93,36 @@ public class SwapManager : MonoBehaviour, ISwapTimer
             player.SetShape(player.CurrentShape == Shape.Light ? Shape.Shadow : Shape.Light);
         }
 
+        Debug.Log("SwapManager: gewisseld", this);
         ResetTimer();
         Swapped?.Invoke();
     }
 
     /// <summary>
-    /// Een korte piep, zodat we geen geluidsbestand nodig hebben.
+    /// Twee korte, duidelijke pieptonen achter elkaar, zodat we geen geluidsbestand nodig hebben.
     /// </summary>
     private static AudioClip CreateBeep()
     {
-        const float duration = 0.2f;
-        const float frequency = 880f;
+        const float beepLength = 0.18f;
+        const float gapLength = 0.08f;
+        const float frequency = 1000f;
+        const float loudness = 0.9f;
+        const float edge = 0.01f;
 
-        var samples = new float[(int)(BeepSampleRate * duration)];
-        for (int i = 0; i < samples.Length; i++)
+        int beepSamples = (int)(BeepSampleRate * beepLength);
+        int gapSamples = (int)(BeepSampleRate * gapLength);
+        int edgeSamples = (int)(BeepSampleRate * edge);
+
+        var samples = new float[beepSamples * 2 + gapSamples];
+        for (int beep = 0; beep < 2; beep++)
         {
-            float fade = 1f - (float)i / samples.Length;
-            samples[i] = Mathf.Sin(2f * Mathf.PI * frequency * i / BeepSampleRate) * 0.5f * fade;
+            int start = beep * (beepSamples + gapSamples);
+            for (int i = 0; i < beepSamples; i++)
+            {
+                // Korte in- en uitfade tegen een tik aan het begin en einde.
+                float fade = Mathf.Min(1f, Mathf.Min(i, beepSamples - i) / (float)edgeSamples);
+                samples[start + i] = Mathf.Sin(2f * Mathf.PI * frequency * i / BeepSampleRate) * loudness * fade;
+            }
         }
 
         AudioClip clip = AudioClip.Create("Piep", samples.Length, 1, BeepSampleRate, false);
