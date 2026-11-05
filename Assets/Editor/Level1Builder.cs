@@ -146,7 +146,7 @@ public static class Level1Builder
     }
 
     // Bordje zonder collider: spelers lopen er gewoon langs.
-    private static void CreateSign(string name, string text, Vector2 position)
+    public static void CreateSign(string name, string text, Vector2 position)
     {
         var sign = new GameObject(name);
         sign.transform.position = position;

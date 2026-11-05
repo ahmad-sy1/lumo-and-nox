@@ -3,6 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Deur die open en dicht kan. Open: je loopt erdoorheen. Dicht: hij blokkeert.
 /// Met openSprite/closedSprite wisselt het plaatje mee; zonder openSprite is de open deur onzichtbaar.
+/// Sturen meerdere knoppen of hendels de deur aan, dan blijft hij open zolang er minstens één aanstaat.
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public class Door : Activatable
@@ -11,26 +12,28 @@ public class Door : Activatable
     [SerializeField] private Sprite openSprite;
     [SerializeField] private Sprite closedSprite;
 
+    private int activations;
+
     private void Start()
     {
-        if (isOpen)
-        {
-            Activate();
-        }
-        else
-        {
-            Deactivate();
-        }
+        SetSolid(!isOpen);
     }
 
     public override void Activate()
     {
+        activations++;
         isOpen = true;
         SetSolid(false);
     }
 
     public override void Deactivate()
     {
+        activations = Mathf.Max(0, activations - 1);
+        if (activations > 0)
+        {
+            return;
+        }
+
         isOpen = false;
         SetSolid(true);
     }
