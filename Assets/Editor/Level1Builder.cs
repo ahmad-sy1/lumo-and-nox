@@ -13,6 +13,8 @@ public static class Level1Builder
     private const float PitLeft = -8f;
     private const float PitRight = -6f;
     private const float PitCenter = (PitLeft + PitRight) / 2f;
+    private const float PoolLeft = 4f;
+    private const float PoolRight = 10f;
 
     // Lumo springt 3,3 tegels hoog en Nox 2,4. Op 2,9 tegels komt dus alleen Lumo.
     private const float HighPlatformSurface = 2.9f;
@@ -64,12 +66,14 @@ public static class Level1Builder
         // 5 en 6: checkpoint-lantaarn en bordje met de kracht.
         LumoTools.PlacePrefab("Checkpoint", new Vector2(1f, FloorTop + 1f));
         CreateSign("Bordje kracht", "Kracht\nS of pijl omlaag", new Vector2(3f, FloorTop + 2.6f));
+        CreateSign("Bordje poel", "DONKERE POEL\nLICHT = DOOD", new Vector2(3f, FloorTop + 4.2f));
 
-        // 7: de poel is 6 breed, te ver om over te springen. De licht-vorm heeft dus Gloed nodig.
+        // 7: de poel zit verzonken in de grondrij en is 6 breed, te ver om over te springen.
+        // De licht-vorm heeft dus Gloed nodig. De schaduw-vorm loopt op de vloer-collider door de poel.
         // Het kristal hangt zo hoog dat je er alleen vanaf het lichtplatform bij kunt.
-        LumoTools.PlacePrefab("DarkZone", new Vector2(5f, FloorTop + 0.5f), "DarkZone 1");
-        LumoTools.PlacePrefab("DarkZone", new Vector2(7f, FloorTop + 0.5f), "DarkZone 2");
-        LumoTools.PlacePrefab("DarkZone", new Vector2(9f, FloorTop + 0.5f), "DarkZone 3");
+        LumoTools.PlacePrefab("DarkPool", new Vector2(5f, FloorTop), "DarkPool 1");
+        LumoTools.PlacePrefab("DarkPool", new Vector2(7f, FloorTop), "DarkPool 2");
+        LumoTools.PlacePrefab("DarkPool", new Vector2(9f, FloorTop), "DarkPool 3");
         LumoTools.PlacePrefab("LightPlatform", new Vector2(7f, FloorTop + 1.5f));
         LumoTools.PlacePrefab("Crystal", new Vector2(7f, FloorTop + 5.4f), "Crystal 3");
 
@@ -108,7 +112,12 @@ public static class Level1Builder
             }
 
             bool light = x < 0f;
-            LumoTools.CreateTile(floor, light ? "licht_vloer_top" : "schaduw_vloer_top", new Vector2(x, FloorTop - 0.5f));
+            // Op de plek van de poel geen bovenste tegel: daar zit de poel zelf.
+            if (x < PoolLeft || x > PoolRight)
+            {
+                LumoTools.CreateTile(floor, light ? "licht_vloer_top" : "schaduw_vloer_top", new Vector2(x, FloorTop - 0.5f));
+            }
+
             LumoTools.CreateTile(floor, light ? "licht_vloer_vul" : "schaduw_vloer_vul", new Vector2(x, FloorTop - 1.5f));
         }
 

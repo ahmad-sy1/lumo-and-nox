@@ -65,7 +65,7 @@ De puzzels draaien om licht en schaduw slim aan en uit zetten, op het goede mome
 | Onderdeel | Wat het doet | Gevaarlijk voor |
 | --- | --- | --- |
 | Lichtstraal (lamp) | Fel licht in een vaste baan | Schaduw-vorm |
-| Donkere poel | Pikzwart gebied op de grond | Licht-vorm |
+| Donkere poel | Verzonken in de grond, met een rood gloeiend en golvend oppervlak, knipperende oogjes en grijpende ranken | Licht-vorm |
 | Stekels / afgrond | Gewoon gevaar | Allebei |
 | Hendel | Zet een lamp aan of uit | – |
 | Drukknop | Opent een deur zolang iemand erop staat | – |
@@ -74,6 +74,22 @@ De puzzels draaien om licht en schaduw slim aan en uit zetten, op het goede mome
 | Schaduwmuur | Alleen door te lopen met Schaduwstap | – |
 | Bewegend platform | Gaat heen en weer of op en neer | – |
 | Kist | Alleen Nox kan hem duwen. Blokkeert een lichtstraal en maakt zo schaduw | – |
+
+## Gevaren herkennen
+
+De speler moet in één blik zien wat dodelijk is. Anders voelt doodgaan oneerlijk. Daarom volgen we deze regels:
+
+- **Eigen kleur:** gevaar heeft een eigen kleur (#ff4d6d). Die gebruiken we alleen voor gevaren in de wereld, nooit voor UI.
+- **Beweging:** gevaar beweegt, met een golvend oppervlak, een pulserende gloed, bubbels, knipperende oogjes en ranken.
+- **Eigen vorm:** gevaar is puntig en grijpend. Decoratie is rond of plat.
+- **Verzonken:** een poel zit verzonken in de grondrij, nooit erbovenop.
+- **Niet alleen kleur:** we leunen ook op beweging en vorm, zodat kleurenblinde spelers het ook zien.
+
+De regels gelden nu voor de donkere poel. Stekels krijgen de kleur later (#61).
+
+De poel is alleen dodelijk voor de licht-vorm. De schaduw-vorm loopt er veilig doorheen. Level 1 leert dit aan met een bord bij de eerste poel: "DONKERE POEL / LICHT = DOOD".
+
+Aangepast na playtest Level 1 (3 nov 2026).
 
 ## Failstate en checkpoints
 

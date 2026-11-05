@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -24,6 +25,9 @@ public static class LumoTools
     public const int ViewHeight = 17;
     public const float FloorTop = -ViewHeight / 2f + 2f;
 
+    // Het oppervlak van de poel ligt 2 pixels onder de grondlijn.
+    private const float PoolSurface = -2f / 16f;
+
     [MenuItem("Lumo & Nox/Build prefabs")]
     public static void BuildPrefabs()
     {
@@ -34,6 +38,7 @@ public static class LumoTools
         BuildPressButton();
         BuildZone<HazardZone>("HazardZone", "stekels", 2);
         BuildZone<DarkZone>("DarkZone", "donkere_poel", 2);
+        BuildDarkPool();
         BuildPlayerDummy();
         BuildPlayer("Lumo", "lumo_licht_sheet", "lumo_schaduw_sheet", Player.Controls.Wasd, Shape.Light, 14f, false);
         BuildPlayer("Nox", "nox_licht_sheet", "nox_schaduw_sheet", Player.Controls.Arrows, Shape.Shadow, 12f, true);
@@ -284,6 +289,42 @@ public static class LumoTools
         zone.GetComponent<BoxCollider2D>().isTrigger = true;
         zone.AddComponent<T>();
         SavePrefab(zone, name);
+    }
+
+    /// <summary>
+    /// Verzonken poel van 2 tegels breed: variant a en b naast elkaar. De root staat op de grondlijn.
+    /// De collider begint bij het oppervlak.
+    /// </summary>
+    private static void BuildDarkPool()
+    {
+        var pool = new GameObject("DarkPool");
+        AddPoolTile(pool, "donkere_poel_a_sheet", -0.5f);
+        AddPoolTile(pool, "donkere_poel_b_sheet", 0.5f);
+
+        var collider = pool.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = new Vector2(2f, 1f);
+        collider.offset = new Vector2(0f, PoolSurface + 0.5f);
+        pool.AddComponent<DarkZone>();
+
+        SavePrefab(pool, "DarkPool");
+    }
+
+    // De pivot zit onderaan, dus één tegel onder de grondlijn: de onderste helft vult de grondrij.
+    private static void AddPoolTile(GameObject pool, string sheet, float x)
+    {
+        Sprite[] frames = AssetDatabase.LoadAllAssetsAtPath(TilesFolder + sheet + ".png")
+            .OfType<Sprite>().OrderBy(sprite => sprite.name).ToArray();
+
+        var tile = new GameObject(sheet);
+        tile.transform.SetParent(pool.transform, false);
+        tile.transform.localPosition = new Vector3(x, -1f, 0f);
+
+        SpriteRenderer renderer = tile.AddComponent<SpriteRenderer>();
+        renderer.sprite = frames[0];
+        renderer.sortingOrder = 1;
+
+        SetArray(tile.AddComponent<SpriteLoop>(), "frames", frames);
     }
 
     private static void BuildLightPlatform()

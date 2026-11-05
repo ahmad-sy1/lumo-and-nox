@@ -7,6 +7,7 @@ Schaduw = kwaad: puntig, doornen, koud, harde randen.
 Gebruik:  python3 tools/generate_tiles.py [uitvoermap]
 Standaard uitvoer: Assets/Art/Tiles/
 """
+import math
 import os
 import sys
 
@@ -45,6 +46,9 @@ C = {
     "hout_d": (82, 56, 40, 255),
     "ijzer": (92, 96, 120, 255),
     "ijzer_h": (140, 146, 170, 255),
+    # Gevaar: alleen voor gevaren in de wereld, nooit voor UI
+    "gevaar": (255, 77, 109, 255),      # #ff4d6d
+    "gevaar_d": (150, 34, 82, 255),     # #962252
 }
 CLEAR = (0, 0, 0, 0)
 
@@ -199,6 +203,76 @@ def donkere_poel():
     px(im, 6, 9, "doorn"); px(im, 13, 10, "doorn")
     # bubbels/oogjes
     px(im, 5, 12, "rots_s"); px(im, 12, 13, "rots_s")
+    return im
+
+
+def poel_frame(f, variant):
+    """Eén frame van 16x32. De onderste helft zit in de grondrij, de bovenste helft steekt erboven uit."""
+    im = new(T, 2 * T)
+    g = T  # grondlijn: bovenkant van de grondrij
+    # pulserende gloed boven het oppervlak
+    pulse = (0, 1, 2, 1)[f]
+    for x in range(T):
+        px(im, x, g + 1, alpha("gevaar", 90 + 30 * pulse))
+        px(im, x, g, alpha("gevaar", 50 + 20 * pulse))
+        px(im, x, g - 1, alpha("gevaar", 22 + 12 * pulse))
+        px(im, x, g - 2, alpha("gevaar", 10 + 6 * pulse))
+    rect(im, 0, g + 2, 15, 31, "poel")
+    # golvend oppervlak: schuift 2 px per frame (periode 8, dus naadloos)
+    for x in range(T):
+        fase = (x + 2 * f) % 8
+        y = g + 2 + (1 if fase in (4, 5, 6) else 0)
+        for yy in range(g + 2, y):
+            px(im, x, yy, alpha("gevaar", 70))
+        px(im, x, y, "gevaar_d")
+        if fase in (1, 2):
+            px(im, x, y, "gevaar")
+    # donkere vlekjes in de diepte
+    for x, y in ((2, 27), (9, 29), (13, 25), (6, 30)):
+        px(im, x, y, "rots_d")
+    # oogjes, knipperen in frame 3
+    ex = 5 if variant == 0 else 1
+    for dx in (0, 1, 4, 5):
+        if f != 3:
+            px(im, ex + dx, g + 7, "gevaar")
+        px(im, ex + dx, g + 8, "gevaar_d")
+    # bubbel die opstijgt en knapt
+    bx = 12 if variant == 0 else 3
+    by = (g + 12, g + 9, g + 6, None)[f]
+    if by:
+        px(im, bx, by, "gevaar_d")
+        px(im, bx, by - 1, alpha("gevaar", 120))
+    else:
+        px(im, bx - 1, g + 1, "gevaar")
+        px(im, bx + 1, g + 1, "gevaar")
+        px(im, bx, g, "gevaar_d")
+    # ranken die omhoog grijpen
+    wortels = (3, 11) if variant == 0 else (7, 14)
+    for i, rx in enumerate(wortels):
+        h = (7, 10, 12, 9)[(f + i * 2) % 4]
+        for k in range(h):
+            y = g + 2 - k
+            x = rx + round(math.sin(k * 0.7 + f * 1.6 + i * 3) * 1.2)
+            kleur = "poel" if k < 3 else ("rots_s" if k < h - 4 else ("rots" if k < h - 2 else "doorn"))
+            px(im, x, y, kleur)
+            if k < h - 3:
+                px(im, x + 1, y, "rots_d" if k >= 3 else "poel")
+        px(im, x, y - 1, "doorn_h")
+        px(im, x, y - 2, "gevaar")
+        px(im, x - 1, y - 1, "doorn")         # klauwtje
+        px(im, x + 1, y, "doorn")
+    # rookvlokjes
+    for sx, sy in ((5, 8), (12, 4), (1, 2)):
+        y = (sy - f * 2) % 14
+        px(im, (sx + variant * 7) % T, y, alpha("doorn", 90 - 3 * (14 - y)))
+    return im
+
+
+def poel_sheet(variant):
+    frames = 4
+    im = new(T * frames, 2 * T)
+    for f in range(frames):
+        im.paste(poel_frame(f, variant), (T * f, 0))
     return im
 
 
@@ -454,6 +528,8 @@ SPRITES = {
     "schaduw_platform": platform_schaduw,
     "schaduwmuur": schaduwmuur,
     "donkere_poel": donkere_poel,
+    "donkere_poel_a_sheet": lambda: poel_sheet(0),
+    "donkere_poel_b_sheet": lambda: poel_sheet(1),
     "stekels": stekels,
     # puzzel
     "kist": kist,
@@ -471,12 +547,25 @@ SPRITES = {
 }
 
 
+def save_if_changed(im, path):
+    """Slaat alleen op als de pixels anders zijn, zodat git geen gelijke plaatjes als gewijzigd ziet."""
+    pixels = im.convert("RGBA")
+    if os.path.exists(path):
+        with Image.open(path) as old:
+            if old.size == pixels.size and old.convert("RGBA").tobytes() == pixels.tobytes():
+                return False
+    pixels.save(path)
+    return True
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join("Assets", "Art", "Tiles")
     os.makedirs(out, exist_ok=True)
+    changed = 0
     for name, fn in SPRITES.items():
-        fn().save(os.path.join(out, f"{name}.png"))
-    print(f"{len(SPRITES)} sprites geschreven naar {out}")
+        if save_if_changed(fn(), os.path.join(out, f"{name}.png")):
+            changed += 1
+    print(f"{changed} van {len(SPRITES)} sprites veranderd in {out}")
 
 
 if __name__ == "__main__":
