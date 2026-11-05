@@ -49,6 +49,7 @@ public static class LumoTools
         BuildWinScreen();
         BuildOptionsMenu();
         BuildPauseMenu();
+        BuildHud();
         // Nieuwe prefabs hier toevoegen.
 
         AssetDatabase.SaveAssets();
@@ -167,6 +168,9 @@ public static class LumoTools
         GameObject options = PlacePrefab("OptionsMenu", Vector2.zero);
         GameObject pause = PlacePrefab("PauseMenu", Vector2.zero);
         SetField(pause.GetComponent<PauseMenu>(), "optionsMenu", options.GetComponent<OptionsMenu>());
+
+        // #14: HUD (timerbalk, vorm-iconen, kristallen).
+        PlacePrefab("HUD", Vector2.zero);
 
         // #11: de echte spelers. De PlayerDummy-prefab blijft bestaan voor losse tests.
         PlacePrefab("Lumo", new Vector2(-14f, FloorTop + 1f));
@@ -511,6 +515,60 @@ public static class LumoTools
     }
 
     // ---------- Pauze en opties ----------
+
+    private static void BuildHud()
+    {
+        Canvas canvas = UiBuilder.CreateCanvas("HUD", 10);
+        HUD script = canvas.gameObject.AddComponent<HUD>();
+
+        var content = new GameObject("Content", typeof(RectTransform));
+        content.transform.SetParent(canvas.transform, false);
+        var contentRect = (RectTransform)content.transform;
+        contentRect.anchorMin = Vector2.zero;
+        contentRect.anchorMax = Vector2.one;
+        contentRect.offsetMin = Vector2.zero;
+        contentRect.offsetMax = Vector2.zero;
+        Transform c = content.transform;
+
+        // Timerbalk boven in het midden (het midden van de ouder is het midden van het scherm).
+        UiBuilder.CreateImage(c, "TimerRand", Palette.nachtS, new Vector2(0f, 480f), new Vector2(620f, 64f));
+        GameObject fill = UiBuilder.CreateImage(c, "TimerBalk", Palette.goud, new Vector2(0f, 480f), new Vector2(600f, 44f));
+        Image fillImage = fill.GetComponent<Image>();
+        // Filled werkt alleen met een sprite; de ingebouwde vierkante is genoeg voor een gekleurde balk.
+        fillImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        fillImage.type = Image.Type.Filled;
+        fillImage.fillMethod = Image.FillMethod.Horizontal;
+        Text timerText = UiBuilder.CreateText(c, "TimerTekst", "30", UiBuilder.NormalText, Palette.steenH, new Vector2(0f, 480f), new Vector2(200f, 60f), bold: true);
+
+        // Lumo links, Nox rechts.
+        Image lumoIcon = CreateHudIcon(c, "Lumo", new Vector2(-880f, 470f));
+        Image noxIcon = CreateHudIcon(c, "Nox", new Vector2(880f, 470f));
+
+        // Kristallen rechtsonder.
+        UiBuilder.CreateImage(c, "KristalRand", Palette.nachtS, new Vector2(790f, -480f), new Vector2(260f, 72f));
+        GameObject crystal = UiBuilder.CreateImage(c, "Kristal", Color.white, new Vector2(715f, -480f), new Vector2(56f, 56f));
+        crystal.GetComponent<Image>().sprite = LoadTile("kristal");
+        Text crystalText = UiBuilder.CreateText(c, "KristalTekst", "0/3", UiBuilder.NormalText, Palette.steenH, new Vector2(820f, -480f), new Vector2(140f, 60f), bold: true);
+
+        SetField(script, "content", content);
+        SetField(script, "timerFill", fillImage);
+        SetField(script, "timerText", timerText);
+        SetField(script, "lumoIcon", lumoIcon);
+        SetField(script, "noxIcon", noxIcon);
+        SetField(script, "crystalText", crystalText);
+        SetField(script, "lightIcon", LoadTile("icoon_zon"));
+        SetField(script, "shadowIcon", LoadTile("icoon_maan"));
+
+        SavePrefab(canvas.gameObject, "HUD");
+    }
+
+    private static Image CreateHudIcon(Transform parent, string name, Vector2 position)
+    {
+        UiBuilder.CreateImage(parent, name + "Rand", Palette.nachtS, position, new Vector2(96f, 96f));
+        GameObject icon = UiBuilder.CreateImage(parent, name + "Icoon", Color.white, position, new Vector2(80f, 80f));
+        UiBuilder.CreateText(parent, name + "Naam", name, UiBuilder.SmallText / 2, Palette.steenS, position + new Vector2(0f, -66f), new Vector2(200f, 30f));
+        return icon.GetComponent<Image>();
+    }
 
     private static void BuildPauseMenu()
     {

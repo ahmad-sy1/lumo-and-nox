@@ -27,6 +27,7 @@ class Player <<MonoBehaviour>> {
   - isDead : bool
   - isUsingAbility : bool
   + CurrentShape : Shape
+  + ControlScheme : Controls
   + Move(direction : float) : void
   + Jump() : void
   + UseAbility() : void
@@ -227,10 +228,14 @@ class MainMenu <<MonoBehaviour>> {
 }
 
 class HUD <<MonoBehaviour>> {
-  - timerBar : Slider
-  - crystalText : TextMeshProUGUI
-  + UpdateTimer(timeLeft : float) : void
-  + UpdateShape(player : Player) : void
+  - content : GameObject
+  - timerFill : Image
+  - timerText : Text
+  - lumoIcon : Image
+  - noxIcon : Image
+  - crystalText : Text
+  - lightIcon : Sprite
+  - shadowIcon : Sprite
 }
 
 class PauseMenu <<MonoBehaviour>> {
