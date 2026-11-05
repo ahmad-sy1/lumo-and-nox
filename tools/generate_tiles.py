@@ -332,6 +332,57 @@ def kristal():
     return im
 
 
+def icoon_zon():
+    im = new()
+    shape = [
+        ".......x........",
+        ".x.....x.....x..",
+        "..x...xxx...x...",
+        "...x.xgggx.x....",
+        ".....gggggg.....",
+        "....gghhhggx....",
+        "xx..gghhgggg.xx.",
+        "xx..gggggggg.xx.",
+        "....gggggggd....",
+        ".....gggggd.....",
+        "...x.xgggx.x....",
+        "..x...xxx...x...",
+        ".x.....x.....x..",
+        ".......x........",
+    ]
+    cmap = {"x": "goud", "g": "goud", "h": "gloed", "d": "goud_d"}
+    for y, row in enumerate(shape):
+        for x, ch in enumerate(row):
+            if ch in cmap:
+                px(im, x, y + 1, cmap[ch])
+    return im
+
+
+def icoon_maan():
+    im = new()
+    shape = [
+        "......hhhh......",
+        "....hhhhh.......",
+        "...hhhhh........",
+        "..hhhhh.........",
+        "..hhhhh.........",
+        ".hhhhhh.........",
+        ".hhhhhh.........",
+        ".hhhhhh.........",
+        "..hhhhhh......dd",
+        "..hhhhhhh....ddd",
+        "...hhhhhhhhhddd.",
+        "....ddhhhhhddd..",
+        "......dddddd....",
+    ]
+    cmap = {"h": "doornH", "d": "doorn"}
+    for y, row in enumerate(shape):
+        for x, ch in enumerate(row):
+            if ch in cmap:
+                px(im, x, y + 1, "doorn_h" if ch == "h" else "doorn")
+    return im
+
+
 def hendel(stand):
     im = new()
     rect(im, 3, 12, 12, 15, "ijzer")
@@ -490,6 +541,9 @@ SPRITES = {
     "deur_dicht": lambda: deur(False),
     "deur_open": lambda: deur(True),
     "portaal": portaal,
+    # HUD
+    "icoon_zon": icoon_zon,
+    "icoon_maan": icoon_maan,
 }
 
 

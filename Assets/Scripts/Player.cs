@@ -46,6 +46,11 @@ public class Player : MonoBehaviour, IPlayer
 
     public bool CanPushBoxes => canPushBoxes;
 
+    /// <summary>
+    /// Wasd = Lumo, Pijltjes = Nox. De HUD gebruikt dit om de iconen goed te zetten.
+    /// </summary>
+    public Controls ControlScheme => controls;
+
     public Shape CurrentShape => shape;
 
     private void Awake()
