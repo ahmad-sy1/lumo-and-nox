@@ -62,7 +62,7 @@ public static class LumoTools
     }
 
     /// <summary>
-    /// Alles in één keer: prefabs, Sandbox, hoofdmenu en Level 1.
+    /// Alles in één keer: prefabs, Sandbox, hoofdmenu, Level 1 en Level 2.
     /// </summary>
     [MenuItem("Lumo & Nox/Build all")]
     public static void BuildAll()
@@ -70,6 +70,7 @@ public static class LumoTools
         BuildSandbox();
         BuildMainMenuScene();
         Level1Builder.Build();
+        Level2Builder.Build();
     }
 
     /// <summary>

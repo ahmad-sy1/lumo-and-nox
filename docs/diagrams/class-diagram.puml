@@ -106,6 +106,7 @@ class Lamp <<MonoBehaviour>> {
 
 class Door <<MonoBehaviour>> {
   - isOpen : bool
+  - activations : int
   - openSprite : Sprite
   - closedSprite : Sprite
   + Activate() : void
