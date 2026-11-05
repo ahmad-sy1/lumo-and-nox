@@ -42,6 +42,7 @@ public static class LumoTools
         BuildPushBox();
         BuildCheckpoint();
         BuildLevelManager();
+        BuildSwapManager();
         BuildCrystal();
         BuildExitPortal();
         BuildGameManager();
@@ -144,6 +145,9 @@ public static class LumoTools
         GameObject levelManager = PlacePrefab("LevelManager", Vector2.zero);
         SetField(levelManager.GetComponent<LevelManager>(), "startPoint", start.transform);
         PlacePrefab("Checkpoint", new Vector2(-1f, FloorTop + 1f));
+
+        // #13: de wissel-timer (Level 1: 30 s; Level 2 zet roundTime op 20).
+        PlacePrefab("SwapManager", Vector2.zero);
 
         // #21: drie kristallen (boven de lantaarn, boven het lichtplatform, boven het bewegende platform)
         // en het uitgangsportaal rechts.
@@ -394,6 +398,13 @@ public static class LumoTools
         var levelManager = new GameObject("LevelManager");
         levelManager.AddComponent<LevelManager>();
         SavePrefab(levelManager, "LevelManager");
+    }
+
+    private static void BuildSwapManager()
+    {
+        var swapManager = new GameObject("SwapManager");
+        swapManager.AddComponent<SwapManager>();
+        SavePrefab(swapManager, "SwapManager");
     }
 
     /// <summary>
@@ -674,6 +685,7 @@ public static class LumoTools
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = Palette.nachtS;
         go.AddComponent<UniversalAdditionalCameraData>();
+        go.AddComponent<AudioListener>();
     }
 
     private static void CreateGlobalLight()

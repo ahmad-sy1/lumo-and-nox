@@ -41,6 +41,10 @@ class SwapManager <<MonoBehaviour>> {
   - roundTime : float
   - warningTime : float
   - timeLeft : float
+  + RoundTime : float
+  + TimeLeft : float
+  + IsWarning : bool
+  + FlashWarning : bool
   + ResetTimer() : void
   - Warn() : void
   - Swap() : void
